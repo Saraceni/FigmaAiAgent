@@ -1,6 +1,6 @@
 import { openai } from '@ai-sdk/openai';
 import { InvalidToolArgumentsError, NoSuchToolError, streamText, ToolExecutionError } from 'ai';
-import { findRelevantContent, returnUpgradeGuide } from '@/lib/ai/embedding';
+import { findRelevantContent } from '@/lib/ai/embedding';
 import { z } from 'zod';
 
 // Allow streaming responses up to 30 seconds
