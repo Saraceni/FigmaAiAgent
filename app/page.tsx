@@ -61,7 +61,7 @@ export default function Chat() {
                 <TbFaceIdError size={32} />
                 <div className="text-2xl font-bold">Oops!</div>
               </div>
-              <div className="text-lg">I'm sorry, something went wrong. Please try again.</div>
+              <div className="text-lg">I&apos;m sorry, something went wrong. Please try again.</div>
             </div>
           </motion.div>}
         </div>
