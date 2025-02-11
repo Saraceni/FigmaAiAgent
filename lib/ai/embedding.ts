@@ -111,9 +111,10 @@ export const findRelevantContent = async (userQuery: string, source: string) => 
         similarEmbeddings.sort((a, b) => b.similarity - a.similarity);
         for (const embedding of similarEmbeddings) {
             // Check if the resource is already in the result
+            const resourceContentWithExtraLinesRemoved = embedding.resourceContent.replaceAll('\n\n', '\n')
             if (!result.find(r => r.id === embedding.resourceId)) {
                 // Check if the resource token count will exceed max token count
-                if(tokenCount + embedding.resourceContent.length > MAX_TOKEN_COUNT) {
+                if(tokenCount + resourceContentWithExtraLinesRemoved.length > MAX_TOKEN_COUNT) {
                     console.log(`Resource ${embedding.resourceTitle} token count will exceed max token count: current count ${tokenCount}`)
                     // Check if the embedding token count will not exceed max token count
                     if(tokenCount + embedding.content.length < MAX_TOKEN_COUNT) {
@@ -125,8 +126,8 @@ export const findRelevantContent = async (userQuery: string, source: string) => 
                         break
                     }
                 } else {
-                    result.push({ content: embedding.resourceContent, id: embedding.resourceId, title: embedding.resourceTitle, description: embedding.resourceDescription })
-                    tokenCount += embedding.resourceContent.length
+                    result.push({ content: resourceContentWithExtraLinesRemoved , id: embedding.resourceId, title: embedding.resourceTitle, description: embedding.resourceDescription })
+                    tokenCount += resourceContentWithExtraLinesRemoved.length
                 }
             }
         }
