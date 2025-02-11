@@ -1,6 +1,6 @@
 'use client';
 
-import { useChat } from 'ai/react';
+import { useChat } from '@ai-sdk/react';
 import { UserCard } from '@/components/ui/userCard';
 import { BotCard } from '@/components/ui/botCard';
 import { FaPaperPlane, FaRobot } from 'react-icons/fa';
@@ -51,7 +51,7 @@ export default function Chat() {
           ))}
           {messages.length === 0 && ExampleQuestions.map(q => (
             <motion.div key={q} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.5 }}>
-              <div className="whitespace-pre-wrap z-2 bg-[#474d5dcc] rounded-md p-[10px] text-[#ababab] text-center shadow-md cursor-pointer" onClick={() => append({ role: 'user', content: q })}>
+              <div className="whitespace-pre-wrap z-2 bg-[#474d5dcc] rounded-md p-[10px] text-[#ababab] text-center shadow-md cursor-pointer hover:bg-[#474d5dcc]/90 hover:text-[#ababab]/90" onClick={() => append({ role: 'user', content: q })}>
                 {q}
               </div>
             </motion.div>
