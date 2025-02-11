@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-// import { Analytics } from '@vercel/analytics/next';
+import { Analytics } from '@vercel/analytics/next';
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Figma AI Assistant",
     description: "Ask Figma documentation and get answers in seconds",
-    //url: "https://tailwind-css-ai-agent.vercel.app/", // Replace with your actual URL
+    url: "https://figma-ai-agent.vercel.app/", // Replace with your actual URL
     images: [
       {
         url: "/url_preview.png", // Path to the image in the public folder
@@ -32,7 +32,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         {children}
-        {/* <Analytics /> */}
+        <Analytics />
       </body>
     </html>
   );
