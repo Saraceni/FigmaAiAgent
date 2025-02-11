@@ -12,7 +12,8 @@ import { TbFaceIdError } from "react-icons/tb";
 const ExampleQuestions = [
   'What are design files?',
   'How to use the toolbar?',
-  'How to use the properties panel with edit access'
+  'How to use the properties panel with edit access?',
+  'How to use local fonts on Figma?',
 ]
 
 export default function Chat() {
