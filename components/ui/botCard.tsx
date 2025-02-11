@@ -24,7 +24,7 @@ export const BotCard = ({ message }: { message: Message }) => {
             <div className="w-8 h-8 rounded-full mr-2 flex items-center justify-center"><Image src='/bot_icon.png' alt='logo' width={32} height={32} /></div>
             <div className="font-bold">AI</div>
         </div>
-        <ReactMarkdown className="font-afacad text-lg" components={{ a: LinkRenderer, img: ImageRenderer }}>{message.content}</ReactMarkdown>
+        <ReactMarkdown className="font-afacad" components={{ a: LinkRenderer, img: ImageRenderer }}>{message.content}</ReactMarkdown>
         {!!message?.toolInvocations?.length && message.toolInvocations.some(toolInvocation => toolInvocation.toolName === 'searchFigmaDocs') && message.content.length === 0 && <div className='flex items-center space-x-2'>
             <span className="italic font-light font-afacad text-lg">Let me get back to you with the answer while I drink my coffee and read the documentation of Figma...</span><PiCoffeeFill className='flex-shrink-0' color='black' />
         </div>}
