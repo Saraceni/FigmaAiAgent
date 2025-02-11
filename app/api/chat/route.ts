@@ -1,4 +1,5 @@
 import { openai } from '@ai-sdk/openai';
+import { google } from "@ai-sdk/google";
 import { InvalidToolArgumentsError, NoSuchToolError, streamText, ToolExecutionError } from 'ai';
 import { findRelevantContent } from '@/lib/ai/embedding';
 import { z } from 'zod';
@@ -7,15 +8,16 @@ import { z } from 'zod';
 export const maxDuration = 30;
 
 const systemPrompt = `You are an AI assistant designed to help users understand and utilize Figma. You have access to the Figma documentation using the tool "searchFigmaDocs".
-Always assume the information you have about Figma, not retrieved from the documentation, is outdated. The only source of information you can rely is the information you obtain from the documentation.
+Always assume the information you have about Figma, not retrieved from the documentation, is outdated. The only source of information you can rely on is the information you obtain from the documentation.
 Always call the right tool to get the correct information.
 Your responses should be informative, friendly, and focused on helping users achieve their design goals using Figma.
 Only respond to questions using information from tool calls. Don't make up information or respond with information that is not in the tool calls.
 If the user asks questions that are not related to Figma, respond, "Sorry, I don't know. Please ask a question related to Figma".
 If no relevant information is found in the tool calls, respond, "Sorry, I couldn't find an answer on the documentation. Can you please elaborate your question in a different way?".
-Your answer should be in markdown format and must include all the information you have from the tool calls, including images, gifs, links, urls and other resources.
+Your answer should be in markdown format. Always include images, gifs, and links from the tool calls in the markdown format. 
+When providing images, use the following markdown syntax: ![Image Description](image_url). 
+Figma is a very visual tool, so it's important to include images, gifs, and links from the tool calls.
 `
-
 // These are some questions that I know are not very well answered by the tool calls
 // how do i add default line height to my text-sm
 // set it default for the text-sm utility class
@@ -23,10 +25,21 @@ Your answer should be in markdown format and must include all the information yo
 
 export async function POST(req: Request) {
   try {
-    const { messages } = await req.json();
+    const { messages, modelProvider = 'openai' } = await req.json();
+
+    const model = modelProvider === 'google' ? google("gemini-2.0-flash-001", { structuredOutputs: true }) :  openai('gpt-4o-mini');
+
+    // let model = google("gemini-2.0-flash-001", {
+    //   structuredOutputs: true,
+    // }) 
+
+    // Use search grounding to get info from google search
+    // model: google('gemini-1.5-pro', {
+    //   useSearchGrounding: true,
+    // }),
 
     const result = streamText({
-      model: openai('gpt-4o-mini'),
+      model,
       system: systemPrompt,
       topP: 0.1,
       messages,
