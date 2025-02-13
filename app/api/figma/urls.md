@@ -215,3 +215,20 @@ https://help.figma.com/hc/en-us/articles/23955143044247-Use-First-Draft-with-Fig
 https://help.figma.com/hc/en-us/articles/24004868368919-Rewrite-translate-and-shorten-text-with-AI
 https://help.figma.com/hc/en-us/articles/24004711129879-Rename-layers-with-AI
 https://help.figma.com/hc/en-us/articles/23796390206743-Replace-text-content-with-AI
+# Projects
+https://help.figma.com/hc/en-us/articles/23510169950871-Design-a-file-thumbnail
+https://help.figma.com/hc/en-us/articles/20953528101783-Design-an-interactive-button
+https://help.figma.com/hc/en-us/articles/18892560291351-Create-a-loading-animation-in-Figma
+https://help.figma.com/hc/en-us/articles/18886645808023-Design-a-search-icon
+https://help.figma.com/hc/en-us/articles/16118297069463-Create-a-photo-gallery-prototype
+https://help.figma.com/hc/en-us/articles/8538436879767-Run-meetings-in-FigJam
+https://help.figma.com/hc/en-us/articles/14078912322199-Design-your-first-button
+https://help.figma.com/hc/en-us/articles/13543867954711-Create-an-illustration-in-Figma-Design
+https://help.figma.com/hc/en-us/articles/22690735962263-Create-a-tooltip-component-set
+https://help.figma.com/hc/en-us/articles/18894664907287-Create-a-responsive-card-with-auto-layout-and-constraints
+https://help.figma.com/hc/en-us/articles/18888057155991-Create-an-onboarding-flow-with-advanced-prototyping
+https://help.figma.com/hc/en-us/articles/18770195788951-Create-a-reusable-icon-grid
+https://help.figma.com/hc/en-us/articles/14942424871575-Create-your-first-meeting-board-in-FigJam
+https://help.figma.com/hc/en-us/articles/14794362149015-Create-pixel-art-in-Figma-Design
+https://help.figma.com/hc/en-us/articles/13666942319127-Create-a-basic-wireframe-and-prototype
+https://help.figma.com/hc/en-us/articles/13502530301207-Make-a-custom-profile-card
