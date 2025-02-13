@@ -19,10 +19,10 @@ const ExampleQuestions = [
 const LoadingSpinner = () => {
   return (
     <div className="flex items-center justify-center">
-      <div className="flex space-x-2">
-        <div className="w-8 h-8 bg-[#232323] rounded-full animate-bounce"></div>
-        <div className="w-8 h-8 bg-[#232323] rounded-full animate-bounce200"></div>
-        <div className="w-8 h-8 bg-[#232323] rounded-full animate-bounce400"></div>
+      <div className="flex space-x-2 opacity-80">
+        <div className="w-6 h-6 bg-[#232323] rounded-full animate-bounce"></div>
+        <div className="w-6 h-6 bg-[#232323] rounded-full animate-bounce200"></div>
+        <div className="w-6 h-6 bg-[#232323] rounded-full animate-bounce400"></div>
       </div>
     </div>
   );
