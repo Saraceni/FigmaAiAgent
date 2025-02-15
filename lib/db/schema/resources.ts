@@ -10,6 +10,7 @@ export enum ResourceType {
   PDF = "pdf",
   URL = "url",
   TEXT = "text",
+  VIDEO = "video",
 }
 
 export const resources = pgTable("resources", {
