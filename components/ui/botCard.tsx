@@ -15,7 +15,7 @@ export const BotCard = ({ message }: { message: Message }) => {
 
     const ImageRenderer = (props: any) => {
         return (
-            <img src={props.src} alt={props.alt} className='w-full max-h-[400px] md:max-h-[700px] object-contain' />
+            <img src={props.src} alt={props.alt} className='w-full max-h-[400px] md:max-h-[500px] object-contain cursor-pointer hover:outline hover:outline-2 hover:outline-black' onClick={() => window.open(props.src, '_blank')} />
         );
     }
 

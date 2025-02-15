@@ -111,7 +111,7 @@ export const findRelevantContent = async (userQuery: string, source: string) => 
         similarEmbeddings.sort((a, b) => b.similarity - a.similarity);
         for (const embedding of similarEmbeddings) {
             // Check if the resource is already in the result
-            const resourceContentWithExtraLinesRemoved = embedding.resourceContent.replaceAll('\n\n', '\n')
+            const resourceContentWithExtraLinesRemoved = embedding.resourceContent.replaceAll('\n\n', '\n').replaceAll('\n\n\n', '\n')
             if (!result.find(r => r.id === embedding.resourceId)) {
                 // Check if the resource token count will exceed max token count
                 if(tokenCount + resourceContentWithExtraLinesRemoved.length > MAX_TOKEN_COUNT) {

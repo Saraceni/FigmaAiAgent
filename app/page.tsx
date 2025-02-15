@@ -46,8 +46,8 @@ export default function Chat() {
         <h1 className="font-gabarito text-2xl md:text-3xl font-bold text-black">Figma AI Assistant</h1>
         <p className="font-afacad text-[#232323] text-center">Ask Figma documentation and get answers in seconds.</p>
       </div>
-      <div className='flex flex-col justify-center items-start bg-white bg-opacity-30 h-full'>
-        <div className="space-y-4 overflow-y-auto px-3 md:px-2 pb-24 w-full flex-1 z-2 pt-[110px]">
+      <div className='flex flex-col justify-center items-start md:items-center bg-white bg-opacity-30 h-full'>
+        <div className="space-y-4 overflow-y-auto px-3 md:px-2 pb-24 w-full flex-1 z-2 pt-[110px] md:max-w-[800px]">
           <div className='bg-gray-200 rounded-md p-4 border border-gray-300 overflow-x-auto opacity-90'>
             <div className="flex items-center mb-2">
               <div className="w-8 h-8 rounded-full mr-2 flex items-center justify-center"><Image src='/bot_icon.png' alt='logo' width={32} height={32} /></div>
