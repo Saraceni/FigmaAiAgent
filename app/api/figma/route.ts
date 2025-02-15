@@ -1,10 +1,12 @@
 import { eq } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { resources, ResourceType } from '@/lib/db/schema/resources';
+import { media } from '@/lib/db/schema/media';
 import fs from 'fs';
 import path from 'path';
 import FirecrawlApp, { ScrapeResponse } from '@mendable/firecrawl-js';
 import { createResource } from '@/lib/actions/resources';
+import { describeImageOrGifFromResource } from '@/lib/google';
 
 const app = new FirecrawlApp({ apiKey: process.env.FIRECRAWL_API_KEY });
 
@@ -20,12 +22,43 @@ export async function GET(req: Request) {
     const urlsArray = data.split('\n');
 
     for (var url of urlsArray) {
-        if(url.startsWith('#') || url.length === 0) {
+        if (url.startsWith('#') || url.length === 0) {
             continue;
         }
         const resource = await db.select().from(resources).where(eq(resources.url, url));
-        if(resource.length > 0) {
+        if (resource.length > 0) {
             console.log("Resource already exists: ", url);
+            // Get the url of the images and gifs from the resource
+            // These urls are in the format: https://help.figma.com/hc/article_attachments/{id}
+            const imagesAndGifsUrls = resource[0].content.match(/https:\/\/help\.figma\.com\/hc\/article_attachments\/\d+/g);
+            if (imagesAndGifsUrls) {
+                for (var imageAndGifUrl of imagesAndGifsUrls) {
+                    const resourceMedia = await db.select().from(media).where(eq(media.url, imageAndGifUrl));
+                    if (resourceMedia.length > 0) continue;
+                    try {
+                        const { description, mimeType } = await describeImageOrGifFromResource(imageAndGifUrl, resource[0].title, resource[0].description);
+                        await db.insert(media).values({
+                            url: imageAndGifUrl,
+                            mimeType: mimeType,
+                            description: description,
+                            resourceId: resource[0].id,
+                        });
+                        console.log("Media created: ", imageAndGifUrl, description, mimeType);
+                    } catch(error) {
+                        if (error instanceof Error && error.message === "SVG not supported") {
+                            // This is fine, we can ignore it
+                            console.error("Caught an unsupported SVG error:", error.message);
+                        } else {
+                            console.error("An error occurred:", error);
+                            // This is not fine, we need to throw an error
+                            throw error;
+                        }
+                    }
+                }
+
+                throw new Error("Too many requests");
+            }
+
             continue;
         } else {
             const scrapeResult = await app.scrapeUrl(url, { formats: ['markdown', 'html'] }) as ScrapeResponse;
