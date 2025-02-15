@@ -3,19 +3,22 @@ import { google } from "@ai-sdk/google";
 import { InvalidToolArgumentsError, NoSuchToolError, streamText, ToolExecutionError } from 'ai';
 import { findRelevantContent } from '@/lib/ai/embedding';
 import { z } from 'zod';
+import { getMediasDescriptionFromUrl } from '@/lib/actions/media';
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
 const systemPrompt = `You are an AI assistant designed to help users understand and utilize Figma. You have access to the Figma documentation using the tool "searchFigmaDocs".
-Always assume the information you have about Figma, not retrieved from the documentation, is outdated. The only source of information you can rely on is the information you obtain from the documentation.
+Whenever you find an url in the documentation, you should use the tool "getMediasDescription" to get the description of the images and gifs.
+You have access to a tool that provides a description of any image or GIF you find in the documentation. Use this tool to understand the content of the images and gifs.
+All images and gifs returned in the markdown have a url in the format: 'https://help.figma.com/hc/article_attachments/{id}'. If you find an image or gif in the documentation, use the tool to get the description of the image or gif.
 Always call the right tool to get the correct information.
 Your responses should be informative, friendly, and focused on helping users achieve their design goals using Figma.
 Only respond to questions using information from tool calls. Don't make up information or respond with information that is not in the tool calls.
 If the user asks questions that are not related to Figma, respond, "Sorry, I don't know. Please ask a question related to Figma".
 If no relevant information is found in the tool calls, respond, "Sorry, I couldn't find an answer on the documentation. Can you please elaborate your question in a different way?".
 Your answer should be in markdown format. Always include images, gifs, and links from the tool calls in the markdown format. 
-When providing images, use the following markdown syntax: ![Image Description](image_url). 
+When providing images or gifs, use the following markdown syntax: ![Image Description](image_or_gif_url). 
 Figma is a very visual tool, so it's important to include images, gifs, and links from the tool calls.
 `
 // These are some questions that I know are not very well answered by the tool calls
@@ -51,6 +54,16 @@ export async function POST(req: Request) {
           }),
           execute: async ({ question }) => {
             return findRelevantContent(question, 'figma_docs')
+          },
+        },
+        getMediasDescription: {
+          description: 'Get the description of the images and gifs from the documentation',
+          parameters: z.object({
+            urls: z.array(z.string()).describe('the urls of the images and gifs'),
+          }),
+          execute: async ({ urls }) => {
+            console.log("Getting medias description from urls");
+            return getMediasDescriptionFromUrl(urls)
           },
         },
       },
