@@ -1,6 +1,6 @@
 'use client';
 
-import { useChat } from '@ai-sdk/react';
+import { Message, useChat } from '@ai-sdk/react';
 import { UserCard } from '@/components/ui/userCard';
 import { BotCard } from '@/components/ui/botCard';
 import { FaPaperPlane, FaRobot } from 'react-icons/fa';
@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { motion } from "motion/react"
 import { useEffect, useState } from 'react';
 import { TbFaceIdError } from "react-icons/tb";
+import { generateId } from 'ai';
 
 const ExampleQuestions = [
   'What are design files?',
@@ -31,14 +32,16 @@ const LoadingSpinner = () => {
 export default function Chat() {
 
   const [error, setError] = useState(false);
-  const { messages, input, handleInputChange, handleSubmit, append, isLoading } = useChat({ maxSteps: 5, onError: () => setError(true) });
+  const [chatId, setChatId] = useState('Default');
+  const { messages, input, handleInputChange, handleSubmit, append, isLoading } = useChat({ maxSteps: 5, onError: () => setError(true), body: { chatId } });
 
-  // useEffect(() => {
-  //   if (messages.length > 0) {
-  //     setError(false);
-  //   }
-  // }, [messages]);
-
+  useEffect(() => {
+    if (process.env.ENVIRONMENT === 'dev') {
+      setChatId('DEV_SESSION');
+    } else {
+      setChatId(generateId());
+    }
+  }, []);
 
   return (
     <div className="flex flex-col w-screen h-screen stretch overflow-hidden bg-[url('/background_full.jpg')] bg-cover bg-center relative">
@@ -47,7 +50,7 @@ export default function Chat() {
         <p className="font-afacad text-[#232323] text-center">Ask Figma documentation and get answers in seconds.</p>
       </div>
       <div className='flex flex-col justify-center items-start md:items-center bg-white bg-opacity-30 h-full'>
-        <div className="space-y-4 overflow-y-auto px-3 md:px-2 pb-24 w-full flex-1 z-2 pt-[110px] md:max-w-[800px]">
+        <div className="space-y-4 overflow-y-auto px-3 md:px-4 pb-24 w-full flex-1 z-2 pt-[110px] md:max-w-[800px]">
           <div className='bg-gray-200 rounded-md p-4 border border-gray-300 overflow-x-auto opacity-90'>
             <div className="flex items-center mb-2">
               <div className="w-8 h-8 rounded-full mr-2 flex items-center justify-center"><Image src='/bot_icon.png' alt='logo' width={32} height={32} /></div>

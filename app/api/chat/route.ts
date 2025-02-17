@@ -4,6 +4,8 @@ import { InvalidToolArgumentsError, NoSuchToolError, streamText, ToolExecutionEr
 import { findRelevantContent } from '@/lib/ai/embedding';
 import { z } from 'zod';
 import { getMediasDescriptionFromUrl } from '@/lib/actions/media';
+import { db } from '@/lib/db';
+import { chat } from '@/lib/db/schema/chat';
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
@@ -28,9 +30,9 @@ Figma is a very visual tool, so it's important to include images, gifs, and link
 
 export async function POST(req: Request) {
   try {
-    const { messages, modelProvider = 'openai' } = await req.json();
+    const { messages, modelProvider = 'openai', chatId } = await req.json();
 
-    const model = modelProvider === 'google' ? google("gemini-2.0-flash-001", { structuredOutputs: true }) :  openai('gpt-4o-mini');
+    const model = modelProvider === 'google' ? google("gemini-2.0-flash-001", { structuredOutputs: true }) : openai('gpt-4o-mini');
 
     // let model = google("gemini-2.0-flash-001", {
     //   structuredOutputs: true,
@@ -46,6 +48,23 @@ export async function POST(req: Request) {
       system: systemPrompt,
       topP: 0.1,
       messages,
+      onFinish: (message) => {
+        if (message.finishReason === 'stop') {
+          // Get the answer:
+          // id: 'chatcmpl-B1gffGTudpRMRLMSzldzK9SI7bERo',
+          const responseId = message.response.id;
+          const response = message.text;
+          const modelId = message.response.modelId;
+          // Get last message where role = 'user'
+
+          const lastUserMessage = [...messages].reverse().find((message: any) => message.role === 'user').content;
+          db.insert(chat).values({ sessionId: chatId, response, modelId, question: lastUserMessage }).then(() => {
+            console.log("Chat saved to database");
+          }).catch((error) => {
+            console.error("Error saving chat to database", error);
+          });
+        }
+      },
       tools: {
         searchFigmaDocs: {
           description: 'Search the Figma documentation for information',
