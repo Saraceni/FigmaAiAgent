@@ -49,10 +49,11 @@ export async function POST(req: Request) {
       topP: 0.1,
       messages,
       onFinish: (message) => {
+        if(process.env.ENVIRONMENT === 'dev') {
+          console.log("Skipping chat save for dev session"); return;
+        }
         if (message.finishReason === 'stop') {
           // Get the answer:
-          // id: 'chatcmpl-B1gffGTudpRMRLMSzldzK9SI7bERo',
-          const responseId = message.response.id;
           const response = message.text;
           const modelId = message.response.modelId;
           // Get last message where role = 'user'

@@ -36,11 +36,7 @@ export default function Chat() {
   const { messages, input, handleInputChange, handleSubmit, append, isLoading } = useChat({ maxSteps: 5, onError: () => setError(true), body: { chatId } });
 
   useEffect(() => {
-    if (process.env.ENVIRONMENT === 'dev') {
-      setChatId('DEV_SESSION');
-    } else {
-      setChatId(generateId());
-    }
+    setChatId(generateId());
   }, []);
 
   return (
