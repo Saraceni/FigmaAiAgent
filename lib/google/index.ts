@@ -146,7 +146,9 @@ export const describeImageOrGifFromResource = async (fileURL: string, resourceTi
         if (!response.ok) throw new Error("Failed to fetch image or gif");
         return response.arrayBuffer().then((buffer) => {
             const mimeType = response.headers.get('Content-Type');
+            // If the file has more than 20971520 bytes I can't upload it to google
             if(mimeType === 'image/svg+xml') throw new Error("SVG not supported");
+            if(buffer.byteLength > 19900000) throw new Error("File too large");
             return { mimeType, buffer };
         })
     });

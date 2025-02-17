@@ -59,6 +59,9 @@ export async function GET(req: Request) {
                         if (error instanceof Error && error.message === "SVG not supported") {
                             // This is fine, we can ignore it
                             console.error("Caught an unsupported SVG error:", error.message);
+                        } else if(error instanceof Error && error.message === "File too large") {
+                            // This is fine, we can ignore it
+                            console.error("Caught a file too large error:", error.message);
                         } else {
                             console.error("An error occurred:", error);
                             // This is not fine, we need to throw an error
