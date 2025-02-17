@@ -25,7 +25,6 @@
 import { GoogleAIFileManager, FileState, FileMetadataResponse } from "@google/generative-ai/server";
 import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import fs from "fs";
-import { url } from "inspector";
 
 // Converts local file information to base64
 const fileToGenerativePart = (path: string, mimeType: string) => {
