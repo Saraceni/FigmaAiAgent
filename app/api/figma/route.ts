@@ -29,12 +29,23 @@ export async function GET(req: Request) {
         if (resource.length > 0) {
             console.log("Resource already exists: ", url);
             // Get the url of the images and gifs from the resource
-            // These urls are in the format: https://help.figma.com/hc/article_attachments/{id}
-            const imagesAndGifsUrls = resource[0].content.match(/https:\/\/help\.figma\.com\/hc\/article_attachments\/\d+/g);
+            // These urls are in the format: [name](https://help.figma.com/hc/article_attachments/{id})
+            const extractedData = resource[0].content.match(/\[[^\[\]]+\]\(https:\/\/help\.figma\.com\/hc\/article_attachments\/(\d+)\)/g);
+            console.log("Extracted data: ", extractedData);
+            // Now I need to verify if in [name] part there is .svg 
+            const extractedDataWithoutSvg = extractedData?.filter(item => !item.includes('.svg') && item.includes('article_attachments'));
+            // Now I need to remove the [name] part and keep only the url
+            const imagesAndGifsUrls = extractedDataWithoutSvg?.map(item => item.split('](')[1].replace(')', ''));
             if (imagesAndGifsUrls) {
+                // Get all media from the resource
+                const allResourceMedia = await db.select().from(media).where(eq(media.resourceId, resource[0].id));
+                if(imagesAndGifsUrls.length === allResourceMedia.length) {
+                    console.log("All images and gifs already exist for the resource: ", url);
+                    continue;
+                }
                 for (var imageAndGifUrl of imagesAndGifsUrls) {
-                    const resourceMedia = await db.select().from(media).where(eq(media.url, imageAndGifUrl));
-                    if (resourceMedia.length > 0) continue;
+                    const resourceMedia = allResourceMedia.find(media => media.url === imageAndGifUrl);
+                    if (resourceMedia) continue;
                     try {
                         const { description, mimeType } = await describeImageOrGifFromResource(imageAndGifUrl, resource[0].title, resource[0].description);
                         await db.insert(media).values({
@@ -56,8 +67,8 @@ export async function GET(req: Request) {
                     }
                 }
 
-                throw new Error("Too many requests");
-            }
+                console.log("Finished adding images and gifs for the resource: ", url);
+            } 
 
             continue;
         } else {
