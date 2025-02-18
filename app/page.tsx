@@ -45,7 +45,7 @@ export default function Chat() {
         <Image src='/robot.png' alt='logo' width={50} height={50} />
         <div className="flex flex-col ml-4 md:ml-2 pb-1">
           <h1 className="font-gabarito text-xl md:text-3xl font-bold text-black">Figma AI Assistant</h1>
-          <p className="font-afacad text-[#232323]">Ask Figma documentation and get answers in seconds.</p>
+          <p className="font-afacad text-sm md:text-base text-[#232323]">Ask Figma documentation and get answers in seconds.</p>
         </div>
       </div>
       <div className='flex flex-col justify-center items-start md:items-center bg-white bg-opacity-30 h-full'>
