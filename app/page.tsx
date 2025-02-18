@@ -41,15 +41,18 @@ export default function Chat() {
 
   return (
     <div className="flex flex-col w-screen h-screen stretch overflow-hidden bg-[url('/background_full.jpg')] bg-cover bg-center relative">
-      <div className="flex flex-col justify-center items-center w-full p-4 space-y-1 backdrop-blur-md absolute top-0 right-0 left-0 z-10">
-        <h1 className="font-gabarito text-2xl md:text-3xl font-bold text-black">Figma AI Assistant</h1>
-        <p className="font-afacad text-[#232323] text-center">Ask Figma documentation and get answers in seconds.</p>
+      <div className="flex justify-center items-end w-full px-4 md:px-3 pt-3 space-y-1 backdrop-blur-md absolute top-0 right-0 left-0 z-10 bg-white/30">
+        <Image src='/robot.png' alt='logo' width={50} height={50} />
+        <div className="flex flex-col ml-4 md:ml-2 pb-1">
+          <h1 className="font-gabarito text-xl md:text-3xl font-bold text-black">Figma AI Assistant</h1>
+          <p className="font-afacad text-[#232323]">Ask Figma documentation and get answers in seconds.</p>
+        </div>
       </div>
       <div className='flex flex-col justify-center items-start md:items-center bg-white bg-opacity-30 h-full'>
         <div className="space-y-4 overflow-y-auto px-3 md:px-4 pb-24 w-full flex-1 z-2 pt-[110px] md:max-w-[800px]">
           <div className='bg-gray-200 rounded-md p-4 border border-gray-300 overflow-x-auto opacity-90'>
             <div className="flex items-center mb-2">
-              <div className="w-8 h-8 rounded-full mr-2 flex items-center justify-center"><Image src='/bot_icon.png' alt='logo' width={32} height={32} /></div>
+              <div className="w-8 h-8 rounded-full mr-2 flex items-center justify-center"><Image src='/avatar.png' alt='logo' width={32} height={32} /></div>
               <div className="font-bold">AI</div>
             </div>
             <p className="font-afacad text-lg">Hello, I&apos;m your Figma AI Assistant. How can I help you today?</p>

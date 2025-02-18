@@ -21,7 +21,7 @@ export const BotCard = ({ message }: { message: Message }) => {
 
     return <div className='bg-gray-200/90 rounded-md p-4 border border-gray-300 overflow-x-auto'>
         <div className="flex items-center mb-2">
-            <div className="w-8 h-8 rounded-full mr-2 flex items-center justify-center"><Image src='/bot_icon.png' alt='logo' width={32} height={32} /></div>
+            <div className="w-8 h-8 rounded-full mr-2 flex items-center justify-center"><Image src='/avatar.png' alt='logo' width={32} height={32} /></div>
             <div className="font-bold">AI</div>
         </div>
         <ReactMarkdown className="font-afacad" components={{ a: LinkRenderer, img: ImageRenderer }}>{message.content}</ReactMarkdown>
