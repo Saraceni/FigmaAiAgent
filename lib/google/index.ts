@@ -148,7 +148,7 @@ export const describeImageOrGifFromResource = async (fileURL: string, resourceTi
             const mimeType = response.headers.get('Content-Type');
             // If the file has more than 20971520 bytes I can't upload it to google
             if(mimeType === 'image/svg+xml') throw new Error("SVG not supported");
-            if(buffer.byteLength > 19900000) throw new Error("File too large");
+            if(buffer.byteLength > 17000000) throw new Error("File too large");
             return { mimeType, buffer };
         })
     });
@@ -156,19 +156,17 @@ export const describeImageOrGifFromResource = async (fileURL: string, resourceTi
     if (!mimeType || !buffer) throw new Error("Failed to fetch image or gif");
     console.log("mimeType", mimeType, "url", fileURL)
 
-    const prompt = `
-    You are a helpful assistant that can describe images and gifs.
+    const prompt = `You are a helpful assistant that can describe images and gifs.
     You are given a resource title and description, and an image or gif.
     The file you are analyzing was extracted from the Figma documentation. Figma is a design tool.
     The section of the Figma documentation has the title "${resourceTitle}" and the description "${resourceDescription}".
     You need to describe the image or gif in a way that is helpful to the user.
     The resource title is ${resourceTitle} and the resource description is ${resourceDescription}.
-    Answer with just the description, no other text.
-    `
+    Answer with just the description, no other text.`
 
     const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY);
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash", });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
     const result = await model.generateContent([
         {
