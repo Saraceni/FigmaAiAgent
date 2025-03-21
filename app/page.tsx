@@ -3,13 +3,14 @@
 import { Message, useChat } from '@ai-sdk/react';
 import { UserCard } from '@/components/ui/userCard';
 import { BotCard } from '@/components/ui/botCard';
-import { FaPaperPlane, FaRobot, FaShareAlt } from 'react-icons/fa';
+import { FaPaperPlane, FaPlus, FaRobot, FaShareAlt } from 'react-icons/fa';
 import Image from 'next/image';
 import { motion } from "motion/react"
 import { useEffect, useState } from 'react';
 import { TbFaceIdError } from "react-icons/tb";
 import { generateId } from 'ai';
 import { toast } from "sonner"
+import { Button } from '@/components/ui/button';
 
 interface ChatHistory {
   id: string;
@@ -77,26 +78,26 @@ export default function Chat() {
               <p className="font-afacad text-sm md:text-base text-[#232323]">Ask Figma documentation and get answers in seconds.</p>
             </div>
           </div>
-          <div className='flex items-center justify-center w-[36px] h-[36px] rounded-full bg-white/30 cursor-pointer hover:bg-white/50 ml-auto' onClick={handleShare}>
+          {chatHistory.length === 0 && <div className='flex items-center justify-center w-[36px] h-[36px] rounded-full bg-white/30 cursor-pointer hover:bg-white/50 ml-auto' onClick={handleShare}>
             <FaShareAlt className="text-[#232323]" />
-          </div>
+          </div>}
         </div>
       </div>
       <div className='flex flex-col justify-center items-start md:items-center bg-white bg-opacity-30 h-full'>
         <div className='overflow-y-auto flex-1 w-full flex items-start justify-center'>
           <div className="space-y-4 px-3 md:px-[10px] pb-24 z-2 pt-[110px] md:max-w-[850px] w-full">
-            <div className='bg-gray-200 rounded-md p-4 border border-gray-300 overflow-x-auto opacity-90'>
+            {chatHistory.length === 0 && <div className='bg-gray-200 rounded-md p-4 border border-gray-300 overflow-x-auto opacity-90'>
               <div className="flex items-center mb-2">
                 <div className="w-8 h-8 rounded-full mr-2 flex items-center justify-center"><Image src='/avatar.png' alt='logo' width={32} height={32} /></div>
                 <div className="font-bold">AI</div>
               </div>
               <p className="font-afacad text-lg">Hello, I&apos;m your Figma AI Assistant. How can I help you today?</p>
-            </div>
+            </div>}
             {chatHistory.map(m => {
               return <motion.div key={m.id} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.5 }}>
-                <div className="whitespace-pre-wrap z-2 mb-4">
+                {/* <div className="whitespace-pre-wrap z-2 mb-4">
                   <UserCard message={{ id: m.id, content: m.question, experimental_attachments: [] }} />
-                </div>
+                </div> */}
                 <div className="whitespace-pre-wrap z-2">
                   <BotCard message={{ role: 'assistant', content: m.response, id: m.id, parts: [] }} />
                 </div>
@@ -132,7 +133,7 @@ export default function Chat() {
             </motion.div>}
           </div>
         </div>
-        <form onSubmit={(event) => { handleSubmit(event); }} className="fixed bottom-0 right-2 left-2 md:mx-auto md:max-w-screen-sm lg:max-w-screen-md p-2 mb-4 md:mb-8 border border-gray-300 bg-white rounded-md shadow-xl flex items-center">
+        {chatHistory.length === 0 && <form onSubmit={(event) => { handleSubmit(event); }} className="fixed bottom-0 right-2 left-2 md:mx-auto md:max-w-screen-sm lg:max-w-screen-md p-2 mb-4 md:mb-8 border border-gray-300 bg-white rounded-md shadow-xl flex items-center">
           <input
             className="w-full p-2"
             value={input}
@@ -142,7 +143,20 @@ export default function Chat() {
           <button type="submit" className="ml-2 p-2 bg-black text-white rounded hover:bg-gray-800">
             <FaPaperPlane />
           </button>
-        </form>
+        </form>}
+        {chatHistory.length > 0 && <div className="fixed bottom-0 right-2 left-2 md:mx-auto md:max-w-screen-sm lg:max-w-screen-md p-2 mb-4 md:mb-8 flex items-center justify-center">
+          <Button 
+            onClick={() => {
+              setChatHistory([]);
+              setChatId(generateId());
+              window.history.pushState({}, '', '/');
+            }}
+            className="md:min-w-[180px] px-4 py-2 flex items-center justify-center space-x-2 animate-bounce hover:animate-none group"
+          >
+            <FaPlus />
+            <span>New Chat</span>
+          </Button>
+        </div>}
       </div>
     </div>
   );
