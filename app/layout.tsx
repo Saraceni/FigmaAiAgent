@@ -20,7 +20,19 @@ export const metadata: Metadata = {
         height: 600, // Optional: specify height
         alt: "Preview Image", // Optional: alt text for the image
       },
+      {
+        url: "/avatar.png", // Square image for mobile previews
+        width: 1200,
+        height: 1200,
+        alt: "Figma AI Assistant",
+      },
     ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Figma AI Assistant",
+    description: "Ask Figma documentation and get answers in seconds",
+    images: ['/url_preview.png'],
   },
 };
 
