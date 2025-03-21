@@ -1,16 +1,10 @@
 import { Message } from 'ai';
-import ReactMarkdown from 'react-markdown';
 import Image from 'next/image';
-import { IoPerson } from 'react-icons/io5';
 
 
-export const UserCard = ({ message }: { message: Message }) => {
+export const UserCard = ({ message }: { message: { id: string, content: string, experimental_attachments?: any[] } }) => {
     return <div className='w-full flex justify-end items-end'>
         <div className='flex justify-end items-end bg-[#13628ce8] rounded-md p-4 w-auto'>
-            {/* <div className="flex items-center mb-2">
-            <div className="w-8 h-8 bg-gray-300 rounded-full mr-2 flex items-center justify-center"><IoPerson /></div>
-            <div className="font-bold">User</div>
-        </div> */}
             <div className="font-afacad text-lg text-end text-white">{message.content}</div>
             <div>
                 {message?.experimental_attachments

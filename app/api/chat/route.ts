@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { getMediasDescriptionFromUrl } from '@/lib/actions/media';
 import { db } from '@/lib/db';
 import { chat } from '@/lib/db/schema/chat';
-
+import { eq } from 'drizzle-orm';
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
@@ -126,4 +126,15 @@ export async function POST(req: Request) {
     console.error('Error processing request:', error); // Log the error for debugging
     return new Response('Internal Server Error', { status: 500 }); // Return a 500 response
   }
+}
+
+// I need to create a function that get that receives a chatId and returns the chat history
+export async function GET(req: Request) {
+  const searchParams = new URL(req.url).searchParams
+  const chatId = searchParams.get('chatId')
+  if (!chatId) {
+    return new Response('Chat ID is required', { status: 400 });
+  }
+  const chatHistory = await db.select().from(chat).where(eq(chat.sessionId, chatId));
+  return new Response(JSON.stringify(chatHistory), { status: 200 });
 }
