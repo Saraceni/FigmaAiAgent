@@ -11,6 +11,7 @@ The AI agent is designed to read and process the Figma Design documentation, all
 
 - **RAG Implementation**: Combines retrieval and generation techniques to provide accurate responses.
 - **Embeddings**: Each URL from the Figma Design documentation is stored as a resource in the database, with corresponding embeddings for efficient retrieval.
+- **Multimodal**: The agent is capable to interpret images on the documentation and provide relevant images and gifs on the response.
 - **API Endpoint**: A GET endpoint that reads `urls.md`, which contains all URLs for the Figma Design documentation.
 - **Web Scraping**: The webscrapping API is available at `http://localhost:3000/api/figma`.
 ## Getting Started
@@ -22,6 +23,7 @@ The AI agent is designed to read and process the Figma Design documentation, all
 - A database (e.g., PostgreSQL) for storing resources and embeddings
 - A Firecrawl API key (https://www.firecrawl.dev/)
 - A OpenAI API key (https://openai.com/index/openai-api/)
+- A Google Generative AI API key (https://cloud.google.com/ai/generative-ai)
 
 ### Environment Variables
 
@@ -31,12 +33,13 @@ To run the application, you need to create a `.env` file in the root directory o
 DATABASE_URL=<your_postgresql_database_url>
 OPENAI_API_KEY=<your_openai_api_key>
 FIRECRAWL_API_KEY=<your_firecrawl_api_key>
+GOOGLE_GENERATIVE_AI_API_KEY=<your_google_generative_ai_api_key>
 ```
 
 - **`DATABASE_URL`**: The connection string for your PostgreSQL database.
 - **`OPENAI_API_KEY`**: Your API key for accessing OpenAI services for chat and embeddings.
 - **`FIRECRAWL_API_KEY`**: The API key for the Firecrawl service used for web scraping.
-
+- **`GOOGLE_GENERATIVE_AI_API_KEY`**: The API key for the Google Generative AI service used for image description.
 ### Installation
 
 1. Clone the repository:
@@ -63,15 +66,23 @@ FIRECRAWL_API_KEY=<your_firecrawl_api_key>
    yarn dev
    ```
 
-2. **Access the web scrapping API**:
-   - The webscrapping API is available at `http://localhost:3000/api/figma`.
-   - The GET endpoint reads `urls.md` and creates embeddings for each page.
-
+2. **Access the web scraping API**:
+   - The web scraping API is available at `http://localhost:3000/api/figma`.
+   - **First run**: The GET endpoint reads `urls.md`, extracts text content from each page, and creates text embeddings for each resource in the database.
+   - **Second run**: The GET endpoint processes all images from previously scraped pages, creates descriptions for them using Google's Generative AI, and stores these as media resources in the database.
+   
 ### API Endpoint
 
 - **GET /api/figma**
-  - Reads `urls.md`, which contains all URLs for the Figma Design documentation.
-  - Creates embeddings for each resource in the database.
+  - **First execution**: 
+    - Reads `urls.md`, which contains all URLs for the Figma Design documentation.
+    - Extracts text content from each page.
+    - Creates text embeddings for each resource in the database.
+  - **Second execution**:
+    - Processes all images from previously scraped pages.
+    - Generates descriptions for each image using Google's Generative AI.
+    - Stores these image descriptions as media resources in the database.
+  - The endpoint automatically detects whether it's the first or second run based on existing database records.
 
 ### Database Schema
 
