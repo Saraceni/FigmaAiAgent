@@ -21,9 +21,9 @@ The AI agent is designed to read and process the Figma Design documentation, all
 - Node.js (version >= v18.17.0)
 - npm or yarn
 - A database (e.g., PostgreSQL) for storing resources and embeddings
-- A Firecrawl API key (https://www.firecrawl.dev/)
-- A OpenAI API key (https://openai.com/index/openai-api/)
-- A Google Generative AI API key (https://cloud.google.com/ai/generative-ai)
+- A Firecrawl API key (<a href="https://www.firecrawl.dev/" target="_blank">https://www.firecrawl.dev/</a>)
+- A OpenAI API key (<a href="https://openai.com/index/openai-api/" target="_blank">https://openai.com/index/openai-api/</a>)
+- A Google Generative AI API key (<a href="https://cloud.google.com/ai/generative-ai" target="_blank">https://cloud.google.com/ai/generative-ai</a>)
 
 ### Environment Variables
 
@@ -91,6 +91,7 @@ Each resource in the database represents a URL from the Figma Design documentati
 - **Resource ID**: Unique identifier for each resource.
 - **URL**: The URL of the Figma Design documentation.
 - **Embeddings**: Vector representations of the resource for efficient retrieval.
+- **Media**: Descriptions of images scraped from the documentation.
 
 ## Contributing
 
