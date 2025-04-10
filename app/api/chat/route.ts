@@ -1,72 +1,114 @@
 import { openai } from '@ai-sdk/openai';
 import { google } from "@ai-sdk/google";
-import { InvalidToolArgumentsError, NoSuchToolError, streamText, ToolExecutionError } from 'ai';
+import { InvalidToolArgumentsError, NoSuchToolError, streamText, ToolExecutionError, createDataStreamResponse } from 'ai';
 import { findRelevantContent } from '@/lib/ai/embedding';
 import { z } from 'zod';
 import { getMediasDescriptionFromUrl } from '@/lib/actions/media';
 import { db } from '@/lib/db';
 import { chat } from '@/lib/db/schema/chat';
 import { eq } from 'drizzle-orm';
+import { callClaudeApi, ComponentOutput, ComponentOutputSchema } from '@/app/design/designAgent';
+import { componentOutputs } from '@/lib/db/schema/componentOutput';
+import EventEmitter from 'events';
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
-const systemPrompt = `You are an AI assistant designed to help users understand and utilize Figma. You have access to the Figma documentation using the tool "searchFigmaDocs".
-Figma is a powerful, collaborative design tool for teams. It brings together powerful design tools with multiplayer collaboration, allowing teams to explore ideas while capturing quality feedback in real time—or anytime.
-Whenever you find an url in the documentation, you should use the tool "getMediasDescription" to get the description of the images and gifs.
-You have access to a tool that provides a description of any image or GIF you find in the documentation. Use this tool to understand the content of the images and gifs.
-All images and gifs returned in the markdown have a url in the format: 'https://help.figma.com/hc/article_attachments/{id}'. If you find an image or gif in the documentation, use the tool to get the description of the image or gif.
-Always call the right tool to get the correct information.
-Your responses should be informative, friendly, and focused on helping users achieve their design goals using Figma.
-When answering questions about figma, only respond to questions using information from tool calls or system prompt. Don't make up information or respond with information that is not in the tool calls or system prompt.
-If the user asks questions that are not related to Figma, or your capabilities, functionalities and objectives as an AI assistant, respond, respond based on the system prompt.
-If the user asks what is Figma, or what Figma does, answer based on the system prompt.
-If the user asks what are you, your specialities or questions related about your capabilities, answer based on the system prompt.
-If no relevant information is found in the tool calls, respond, "Sorry, I couldn't find an answer on the documentation. Can you please elaborate your question in a different way?".
-Your answer should be in markdown format. Always include images, gifs, and links from the tool calls in the markdown format. 
-When providing images or gifs, use the following markdown syntax: ![Image Description](image_or_gif_url). 
-Figma is a very visual tool, so it's important to include images, gifs, and links from the tool calls.
-`
-// These are some questions that I know are not very well answered by the tool calls
-// how do i add default line height to my text-sm
-// set it default for the text-sm utility class
-// how do I add a default value to line height on my text-sm class?
+const systemPrompt = `You are an AI assistant designed to help users understand and utilize Figma and create web components based on Figma designs. 
+
+You have two main capabilities:
+1. Help users understand and utilize Figma using the Figma documentation
+2. Create web components based on Figma designs or user descriptions
+
+For Figma documentation:
+- Use the "searchFigmaDocs" tool to search Figma documentation
+- Use "getMediasDescription" tool for any images/GIFs found in docs
+- Only use information from tool calls or this system prompt
+- Include relevant images and GIFs in markdown format
+
+For web components:
+- Use the "createWebComponent" tool to generate components stylingNotes
+- The component and its details will be displayed automatically from the tool call result
+- Focus on explaining the component's stylingNotes
+
+When users ask about:
+- Figma features/usage -> Use searchFigmaDocs tool
+- Creating components from Figma designs -> Use createWebComponent tool
+- General Figma questions -> Use system prompt info
+
+Always format responses in markdown.
+If the user asks questions about Figma, include visual elements when available. 
+If the users asks for a component, don't include raw HTML, CSS, color details in your response.
+If no relevant information is found, ask for clarification.
+
+Remember: Figma is a powerful, collaborative design tool for teams that brings together design tools with multiplayer collaboration.
+
+Before proving an answer, check the answer you want to provide. If it includes long raw CSS and HTML snippets from the createWebComponent tool, remove them.
+
+CRITICAL INSTRUCTION: After calling the createWebComponent tool, DO NOT include any raw HTML, CSS, colorDetails, in your response. The component will be displayed automatically. Only explain the component's functionality and design decisions.`
+
 
 export async function POST(req: Request) {
-  try {
-    const { messages, modelProvider = 'openai', chatId } = await req.json();
 
+  try {
+
+    const { messages, modelProvider = 'openai', sessionId } = await req.json();
     const model = modelProvider === 'google' ? google("gemini-2.0-flash-001", { structuredOutputs: true }) : openai('gpt-4o-mini');
 
-    // let model = google("gemini-2.0-flash-001", {
-    //   structuredOutputs: true,
-    // }) 
+    const saveChatToDb = (lastUserMessage: any, response: string, modelId: string) => {
 
-    // Use search grounding to get info from google search
-    // model: google('gemini-1.5-pro', {
-    //   useSearchGrounding: true,
-    // }),
+      let generatedComponent: ComponentOutput | null = null
+      if (messages.length > 0) {
+        const lastMessage = messages[messages.length - 1]
+        if (lastMessage.role === 'assistant') {
+          for (var i = 0; i < lastMessage.toolInvocations.length; i++) {
+            const toolInvocation = lastMessage.toolInvocations[i]
+            if (toolInvocation.toolName === 'createWebComponent' && toolInvocation.state === 'result') {
+              generatedComponent = toolInvocation.result as ComponentOutput
+              break;
+            }
+          }
+        }
+      }
+
+      db.insert(chat).values({ sessionId, response, modelId, question: lastUserMessage }).returning({ id: chat.id }).then((chat) => {
+        if (generatedComponent) {
+          db.insert(componentOutputs).values({
+            chatId: chat[0].id, // Using the actual chat.id instead of sessionId
+            html: generatedComponent._metadata.html,
+            css: generatedComponent._metadata.css,
+            stylingNotes: generatedComponent.stylingNotes || '',
+            colorDetails: JSON.stringify(generatedComponent._metadata.colorDetails || {})
+          }).catch((error) => {
+            console.error("Error saving component to database", error);
+          })
+        }
+      }).catch((error) => {
+        console.error("Error saving chat to database", error);
+      });
+
+    };
 
     const result = streamText({
       model,
       system: systemPrompt,
       topP: 0.1,
       messages,
-      onFinish: (message) => {
-        if(process.env.ENVIRONMENT === 'dev') {
+      onFinish: (result) => {
+
+        if (process.env.ENVIRONMENT === 'dev') {
           console.log("Skipping chat save for dev session"); return;
         }
-        if (message.finishReason === 'stop') {
-          // Get the answer:
-          const response = message.text;
-          const modelId = message.response.modelId;
-          // Get last message where role = 'user'
 
+        if (result.finishReason === 'stop') {
+
+          // Get the answer:
+          const response = result.text;
+          const modelId = result.response.modelId;
+
+          // Get last message where role = 'user'
           const lastUserMessage = [...messages].reverse().find((message: any) => message.role === 'user').content;
-          db.insert(chat).values({ sessionId: chatId, response, modelId, question: lastUserMessage }).then(() => {
-            console.log("Chat saved to database");
-          }).catch((error) => {
-            console.error("Error saving chat to database", error);
-          });
+
+          saveChatToDb(lastUserMessage, response, modelId);
         }
       },
       tools: {
@@ -89,21 +131,38 @@ export async function POST(req: Request) {
             return getMediasDescriptionFromUrl(urls)
           },
         },
+        createWebComponent: {
+          description: 'Create a web component based on a design description',
+          parameters: z.object({
+            userRequest: z.string().describe('description of the component to create'),
+            constraints: z.object({
+              colorPalette: z.array(z.string()).optional(),
+              styleGuide: z.object({
+                name: z.string(),
+                description: z.string()
+              }).optional()
+            }).optional()
+          }),
+          execute: async ({ userRequest, constraints }) => {
+            try {
+              const result = await callClaudeApi(userRequest, constraints)
+              const componentData = result.component
+              return {
+                stylingNotes: componentData.stylingNotes,
+                _metadata: {
+                  html: componentData.html,
+                  css: componentData.css,
+                  colorDetails: componentData.colorDetails,
+                }
+              };
+            } catch (err) {
+              console.error('Design API error:', err);
+              throw new Error(`Failed to create web component: ${err}`);
+            }
+          },
+        },
       },
     });
-
-    for await (const part of result.fullStream) {
-      switch (part.type) {
-        // ... handle other part types
-
-        case 'error': {
-          const error = part.error
-          // This works
-          console.error(error)
-          break
-        }
-      }
-    }
 
     return result.toDataStreamResponse({
       getErrorMessage: error => {
@@ -121,7 +180,8 @@ export async function POST(req: Request) {
           return 'An unknown error occurred.';
         }
       },
-    });
+    })
+
   } catch (error) {
     console.error('Error processing request:', error); // Log the error for debugging
     return new Response('Internal Server Error', { status: 500 }); // Return a 500 response
@@ -131,10 +191,10 @@ export async function POST(req: Request) {
 // I need to create a function that get that receives a chatId and returns the chat history
 export async function GET(req: Request) {
   const searchParams = new URL(req.url).searchParams
-  const chatId = searchParams.get('chatId')
-  if (!chatId) {
-    return new Response('Chat ID is required', { status: 400 });
+  const sessionId = searchParams.get('sessionId')
+  if (!sessionId) {
+    return new Response('sessionId is required', { status: 400 });
   }
-  const chatHistory = await db.select().from(chat).where(eq(chat.sessionId, chatId));
+  const chatHistory = await db.select().from(chat).where(eq(chat.sessionId, sessionId)).leftJoin(componentOutputs, eq(componentOutputs.chatId, chat.id));
   return new Response(JSON.stringify(chatHistory), { status: 200 });
 }

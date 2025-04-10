@@ -12,19 +12,33 @@ import { generateId } from 'ai';
 import { toast } from "sonner"
 import { Button } from '@/components/ui/button';
 
-interface ChatHistory {
+export interface ComponentInChatHistory {
   id: string;
-  sessionId: string;
-  response: string;
-  question: string;
-  createdAt: Date;
+  chatId: string;
+  html: string;
+  css: string;
+  stylingNotes: string;
+  colorDetails: { hex: string, usage: string }[];
 }
+
+interface ChatHistory {
+  chat: {
+    id: string;
+    sessionId: string;
+    response: string;
+    question: string;
+    createdAt: Date;
+  },
+  component_outputs?: ComponentInChatHistory 
+}
+
+const initialMessage = "Hello, I'm your Figma AI Assistant. How can I help you today? You can ask me about Figma documentation or request UI component designs for your projects."
 
 const ExampleQuestions = [
   'What are design files?',
   'How to use the toolbar?',
-  'How to use the properties panel with edit access?',
   'How to use local fonts on Figma?',
+  'Create a modern product card for my online store using blue (#3A5199) for buttons, yellow (#F8C630) for highlights, and white background with dark text? Include a product image, name, price, star rating, "Add to Cart" button, and save icon. Make it clean with rounded corners and subtle hover effects, and ensure it\'s responsive for mobile.'
 ]
 
 const LoadingSpinner = () => {
@@ -42,27 +56,39 @@ const LoadingSpinner = () => {
 export default function Chat() {
 
   const [error, setError] = useState(false);
-  const [chatId, setChatId] = useState('Default');
+  const [sessionId, setSessionId] = useState('Default');
   const [chatHistory, setChatHistory] = useState<ChatHistory[]>([]);
-  const { messages, input, handleInputChange, handleSubmit, append, isLoading } = useChat({ maxSteps: 5, onError: () => setError(true), body: { chatId } });
+  const { messages, input, handleInputChange, handleSubmit, append, isLoading } = useChat({ maxSteps: 5, onError: () => setError(true), body: { sessionId } });
 
-  const getChatHistory = async (chatId: string) => {
-    const response = await fetch(`/api/chat?chatId=${chatId}`);
+  const getChatHistory = async (sessionId: string) => {
+    const response = await fetch(`/api/chat?sessionId=${sessionId}`);
     const chatHistory = await response.json();
-    setChatHistory(chatHistory);
+    setChatHistory(chatHistory.map((data: any) => {
+      if (data.component_outputs) {
+        return {
+          ...data,
+          component_outputs: {
+            ...data.component_outputs,
+            colorDetails: JSON.parse(data.component_outputs.colorDetails)
+          } 
+        }
+      } else {
+        return data
+      }
+    }));
   }
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const chatIdFromUrl = urlParams.get('chatId');
-    if (chatIdFromUrl) {
-      getChatHistory(chatIdFromUrl);
+    const sessionIdFromUrl = urlParams.get('sessionId');
+    if (sessionIdFromUrl) {
+      getChatHistory(sessionIdFromUrl);
     }
-    setChatId(generateId());
+    setSessionId(generateId());
   }, []);
 
   const handleShare = () => {
-    const shareUrl = `${window.location.origin}?chatId=${chatId}`;
+    const shareUrl = `${window.location.origin}?sessionId=${sessionId}`;
     navigator.clipboard.writeText(shareUrl);
     toast("Share link copied to clipboard!")
   }
@@ -91,15 +117,15 @@ export default function Chat() {
                 <div className="w-8 h-8 rounded-full mr-2 flex items-center justify-center"><Image src='/avatar.png' alt='logo' width={32} height={32} /></div>
                 <div className="font-bold">AI</div>
               </div>
-              <p className="font-afacad text-lg">Hello, I&apos;m your Figma AI Assistant. How can I help you today?</p>
+              <p className="font-afacad text-lg">{initialMessage}</p>
             </div>}
             {chatHistory.map(m => {
-              return <motion.div key={m.id} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.5 }}>
-                {/* <div className="whitespace-pre-wrap z-2 mb-4">
-                  <UserCard message={{ id: m.id, content: m.question, experimental_attachments: [] }} />
-                </div> */}
+              return <motion.div key={m.chat.id} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.5 }}>
+                <div className="whitespace-pre-wrap z-2 mb-4">
+                  <UserCard message={{ id: m.chat.id, content: m.chat.question, experimental_attachments: [] }} />
+                </div>
                 <div className="whitespace-pre-wrap z-2">
-                  <BotCard message={{ role: 'assistant', content: m.response, id: m.id, parts: [] }} />
+                  <BotCard message={{ role: 'assistant', content: m.chat.response, id: m.chat.id, parts: [] }} componentOutput={m.component_outputs} />
                 </div>
               </motion.div>
             })}
@@ -145,10 +171,10 @@ export default function Chat() {
           </button>
         </form>}
         {chatHistory.length > 0 && <div className="fixed bottom-0 right-2 left-2 md:mx-auto md:max-w-screen-sm lg:max-w-screen-md p-2 mb-4 md:mb-8 flex items-center justify-center">
-          <Button 
+          <Button
             onClick={() => {
               setChatHistory([]);
-              setChatId(generateId());
+              setSessionId(generateId());
               window.history.pushState({}, '', '/');
             }}
             className="md:min-w-[180px] px-4 py-2 flex items-center justify-center space-x-2 animate-bounce hover:animate-none group"
