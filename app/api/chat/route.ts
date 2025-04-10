@@ -11,7 +11,7 @@ import { callClaudeApi, ComponentOutput, ComponentOutputSchema } from '@/app/des
 import { componentOutputs } from '@/lib/db/schema/componentOutput';
 import EventEmitter from 'events';
 // Allow streaming responses up to 30 seconds
-export const maxDuration = 45;
+export const maxDuration = 60;
 
 const systemPrompt = `You are an AI assistant designed to help users understand and utilize Figma and create web components based on Figma designs. 
 
