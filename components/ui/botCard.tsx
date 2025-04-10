@@ -142,10 +142,10 @@ export const BotCard = ({ message, componentOutput = undefined }: { message: Mes
     <ReactMarkdown className="font-afacad" components={{ a: LinkRenderer, img: ImageRenderer }}>{message.content}</ReactMarkdown>
 
     {/* Tool invocation messages */}
-    {message?.parts?.length && message.parts.some(part => part.type === 'tool-invocation' && part.toolInvocation.state !== 'result' && part.toolInvocation.toolName === 'searchFigmaDocs') && <div className='flex items-center space-x-2'>
+    {!!message?.parts?.length && message.parts.some(part => part.type === 'tool-invocation' && part.toolInvocation.state !== 'result' && part.toolInvocation.toolName === 'searchFigmaDocs') && <div className='flex items-center space-x-2'>
       <span className="italic font-light font-afacad text-lg">Let me get back to you with the answer while I drink my coffee and read the documentation of Figma...</span><PiCoffeeFill className='flex-shrink-0' color='black' />
     </div>}
-    {message?.parts?.length && message.parts.some(part => part.type === 'tool-invocation' && part.toolInvocation.state !== 'result' && part.toolInvocation.toolName === 'createWebComponent') && <div className='flex items-center space-x-2'>
+    {!!message?.parts?.length && message.parts.some(part => part.type === 'tool-invocation' && part.toolInvocation.state !== 'result' && part.toolInvocation.toolName === 'createWebComponent') && <div className='flex items-center space-x-2'>
       <span className="italic font-light font-afacad text-lg">Let me create the web component for you...</span><MdWeb className='flex-shrink-0' color='black' />
     </div>}
 

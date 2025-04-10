@@ -58,12 +58,15 @@ export default function Chat() {
   const [error, setError] = useState(false);
   const [sessionId, setSessionId] = useState('Default');
   const [chatHistory, setChatHistory] = useState<ChatHistory[]>([]);
+  const [isLoadingChatHistory, setIsLoadingChatHistory] = useState(false);
   const { messages, input, handleInputChange, handleSubmit, append, isLoading } = useChat({ maxSteps: 5, onError: () => setError(true), body: { sessionId } });
 
   const getChatHistory = async (sessionId: string) => {
-    const response = await fetch(`/api/chat?sessionId=${sessionId}`);
-    const chatHistory = await response.json();
-    setChatHistory(chatHistory.map((data: any) => {
+    try {
+      setIsLoadingChatHistory(true);
+      const response = await fetch(`/api/chat?sessionId=${sessionId}`);
+      const chatHistory = await response.json();
+      setChatHistory(chatHistory.map((data: any) => {
       if (data.component_outputs) {
         return {
           ...data,
@@ -74,8 +77,13 @@ export default function Chat() {
         }
       } else {
         return data
-      }
-    }));
+        }
+      }));
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoadingChatHistory(false);
+    }
   }
 
   useEffect(() => {
@@ -112,7 +120,7 @@ export default function Chat() {
       <div className='flex flex-col justify-center items-start md:items-center bg-white bg-opacity-30 h-full'>
         <div className='overflow-y-auto flex-1 w-full flex items-start justify-center'>
           <div className="space-y-4 px-3 md:px-[10px] pb-24 z-2 pt-[110px] md:max-w-[850px] w-full">
-            {chatHistory.length === 0 && <div className='bg-gray-200 rounded-md p-4 border border-gray-300 overflow-x-auto opacity-90'>
+            {chatHistory.length === 0 && !isLoadingChatHistory && <div className='bg-gray-200 rounded-md p-4 border border-gray-300 overflow-x-auto opacity-90'>
               <div className="flex items-center mb-2">
                 <div className="w-8 h-8 rounded-full mr-2 flex items-center justify-center"><Image src='/avatar.png' alt='logo' width={32} height={32} /></div>
                 <div className="font-bold">AI</div>
@@ -136,7 +144,7 @@ export default function Chat() {
                 </div>
               </motion.div>
             ))}
-            {messages.length === 0 && chatHistory.length === 0 && ExampleQuestions.map(q => (
+            {messages.length === 0 && chatHistory.length === 0 && !isLoadingChatHistory && ExampleQuestions.map(q => (
               <motion.div key={q} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.5 }}>
                 <div className="whitespace-pre-wrap z-2 bg-[#474d5dcc] rounded-md p-[10px] text-[#ababab] text-center shadow-md cursor-pointer hover:bg-[#474d5dcc]/90 hover:text-[#ababab]/90" onClick={() => append({ role: 'user', content: q })}>
                   {q}
@@ -152,7 +160,7 @@ export default function Chat() {
                 <div className="text-lg">I&apos;m sorry, something went wrong. Please try again.</div>
               </div>
             </motion.div>}
-            {isLoading && <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.5 }}>
+            {(isLoading || isLoadingChatHistory) && <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.5 }}>
               <div className="flex items-center justify-center py-4">
                 <LoadingSpinner />
               </div>
