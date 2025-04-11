@@ -56,6 +56,11 @@ export async function POST(req: Request) {
 
     const saveChatToDb = (lastUserMessage: any, response: string, modelId: string) => {
 
+      if (process.env.ENVIRONMENT === 'dev') {
+        console.log("Skipping chat save for dev session");
+        return;
+      }
+
       let generatedComponent: ComponentOutput | null = null
       if (messages.length > 0) {
         const lastMessage = messages[messages.length - 1]
