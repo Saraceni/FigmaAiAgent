@@ -10,7 +10,7 @@ import { ComponentInChatHistory } from '@/app/page';
 
 function HtmlRenderer({ htmlContent, cssContent }: { htmlContent: string, cssContent: string }) {
   return (
-    <div className="p-2">
+    <div>
       <iframe
         srcDoc={`
             <!DOCTYPE html>
@@ -82,8 +82,8 @@ export const BotCard = ({ message, componentOutput = undefined }: { message: Mes
 
     // Add an explicit type guard here
     if (generatedComponent) {
-      return <div className="w-full h-full">
-        <div className="w-full overflow-y-auto h-full py-2">
+      return <div className="w-full h-full mb-2 border border-gray-300 rounded-md bg-gray-50">
+        <div className="w-full overflow-y-auto h-full p-1">
           <Tabs defaultValue="preview" className="w-full h-full">
             <TabsList>
               <TabsTrigger value="preview">Preview</TabsTrigger>
@@ -139,6 +139,10 @@ export const BotCard = ({ message, componentOutput = undefined }: { message: Mes
       <div className="w-8 h-8 rounded-full mr-2 flex items-center justify-center"><Image src='/avatar.png' alt='logo' width={32} height={32} /></div>
       <div className="font-bold">AI</div>
     </div>
+
+    {/* Display all message parts */}
+    {renderGeneratedComponent()}
+
     <ReactMarkdown className="font-afacad" components={{ a: LinkRenderer, img: ImageRenderer }}>{message.content}</ReactMarkdown>
 
     {/* Tool invocation messages */}
@@ -148,9 +152,6 @@ export const BotCard = ({ message, componentOutput = undefined }: { message: Mes
     {!!message?.parts?.length && message.parts.some(part => part.type === 'tool-invocation' && part.toolInvocation.state !== 'result' && part.toolInvocation.toolName === 'createWebComponent') && <div className='flex items-center space-x-2'>
       <span className="italic font-light font-afacad text-lg">Let me create the web component for you...</span><MdWeb className='flex-shrink-0' color='black' />
     </div>}
-
-    {/* Display all message parts */}
-    {renderGeneratedComponent()}
 
 
     {/* Display attachments */}
