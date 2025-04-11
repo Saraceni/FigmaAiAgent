@@ -29,7 +29,7 @@ interface ChatHistory {
     question: string;
     createdAt: Date;
   },
-  component_outputs?: ComponentInChatHistory 
+  component_outputs?: ComponentInChatHistory
 }
 
 const initialMessage = "Hello, I'm your Figma AI Assistant. How can I help you today? You can ask me about Figma documentation or request UI component designs for your projects."
@@ -66,19 +66,24 @@ export default function Chat() {
       setIsLoadingChatHistory(true);
       const response = await fetch(`/api/chat?sessionId=${sessionId}`);
       const chatHistory = await response.json();
-      setChatHistory(chatHistory.map((data: any) => {
-      if (data.component_outputs) {
-        return {
-          ...data,
-          component_outputs: {
-            ...data.component_outputs,
-            colorDetails: JSON.parse(data.component_outputs.colorDetails)
-          } 
-        }
-      } else {
-        return data
-        }
-      }));
+      setChatHistory(chatHistory
+        .map((data: any) => {
+          if (data.component_outputs) {
+            return {
+              ...data,
+              component_outputs: {
+                ...data.component_outputs,
+                colorDetails: JSON.parse(data.component_outputs.colorDetails)
+              }
+            }
+          } else {
+            return data
+          }
+        })
+        .sort((a: ChatHistory, b: ChatHistory) => {
+          return new Date(a.chat.createdAt).getTime() - new Date(b.chat.createdAt).getTime();
+        })
+      );
     } catch (error) {
       console.error(error);
     } finally {
