@@ -10,20 +10,26 @@ import { eq } from 'drizzle-orm';
 import { callClaudeApi, ComponentOutput, ComponentOutputSchema } from '@/app/design/designAgent';
 import { componentOutputs } from '@/lib/db/schema/componentOutput';
 import EventEmitter from 'events';
+import { getImagesFromPexels } from '@/lib/images/pexels';
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 60;
 
 const systemPrompt = `You are an AI assistant designed to help users understand and utilize Figma and create web components based on Figma designs. 
 
-You have two main capabilities:
+You have three main capabilities:
 1. Help users understand and utilize Figma using the Figma documentation
 2. Create web components based on Figma designs or user descriptions
+3. Get images from Pexels
 
 For Figma documentation:
 - Use the "searchFigmaDocs" tool to search Figma documentation
 - Use "getMediasDescription" tool for any images/GIFs found in docs
 - Only use information from tool calls or this system prompt
 - Include relevant images and GIFs in markdown format
+
+For images:
+- Use the "getImagesFromPexels" tool to search for images
+- Include relevant images in markdown format
 
 For web components:
 - Use the "createWebComponent" tool to generate components stylingNotes
@@ -34,7 +40,7 @@ When users ask about:
 - Figma features/usage -> Use searchFigmaDocs tool
 - Creating components from Figma designs -> Use createWebComponent tool
 - General Figma questions -> Use system prompt info
-
+- Images -> Use getImagesFromPexels tool
 Always format responses in markdown.
 If the user asks questions about Figma, include visual elements when available. 
 If the users asks for a component, don't include raw HTML, CSS, color details in your response.
@@ -134,6 +140,16 @@ export async function POST(req: Request) {
           execute: async ({ urls }) => {
             console.log("Getting medias description from urls");
             return getMediasDescriptionFromUrl(urls)
+          },
+        },
+        getImagesFromPexels: {
+          description: 'Get images from Pexels',
+          parameters: z.object({
+            query: z.string().describe('the query to search for'),
+          }),
+          execute: async ({ query }) => {
+            console.log("Getting images from Pexels");
+            return getImagesFromPexels(query)
           },
         },
         createWebComponent: {

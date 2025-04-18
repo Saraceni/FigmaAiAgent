@@ -1,7 +1,7 @@
 import { Message } from 'ai';
 import ReactMarkdown from 'react-markdown';
 import { PiCoffeeFill } from "react-icons/pi";
-import { MdWeb } from "react-icons/md";
+import { MdImageSearch, MdWeb } from "react-icons/md";
 import Image from 'next/image';
 import ColorPalleteCard from '@/app/design/colorPalleteCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -152,6 +152,10 @@ export const BotCard = ({ message, componentOutput = undefined }: { message: Mes
     {!!message?.parts?.length && message.parts.some(part => part.type === 'tool-invocation' && part.toolInvocation.state !== 'result' && part.toolInvocation.toolName === 'createWebComponent') && <div className='flex items-center space-x-2'>
       <span className="italic font-light font-afacad text-lg">Let me create the web component for you...</span><MdWeb className='flex-shrink-0' color='black' />
     </div>}
+    {!!message?.parts?.length && message.parts.some(part => part.type === 'tool-invocation' && part.toolInvocation.state !== 'result' && part.toolInvocation.toolName === 'getImagesFromPexels') && <div className='flex items-center space-x-2'>
+      <span className="italic font-light font-afacad text-lg">Let me search for images for you...</span><MdImageSearch className='flex-shrink-0' color='black' />
+    </div>}
+
 
 
     {/* Display attachments */}
