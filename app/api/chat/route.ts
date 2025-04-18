@@ -62,6 +62,8 @@ export async function POST(req: Request) {
 
     const saveChatToDb = (lastUserMessage: any, response: string, modelId: string) => {
 
+      console.log("saveChatToDb called");
+
       if (process.env.ENVIRONMENT === 'dev') {
         console.log("Skipping chat save for dev session");
         return;
@@ -80,6 +82,8 @@ export async function POST(req: Request) {
           }
         }
       }
+
+      console.log("Saving chat to database");
 
       db.insert(chat).values({ sessionId, response, modelId, question: lastUserMessage }).returning({ id: chat.id }).then((chat) => {
         if (generatedComponent) {
@@ -106,11 +110,15 @@ export async function POST(req: Request) {
       messages,
       onFinish: (result) => {
 
+        console.log("onFinish");
+
         if (process.env.ENVIRONMENT === 'dev') {
           console.log("Skipping chat save for dev session"); return;
         }
 
         if (result.finishReason === 'stop') {
+
+          console.log("Saving chat to database");
 
           // Get the answer:
           const response = result.text;
