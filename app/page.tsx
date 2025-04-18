@@ -32,13 +32,13 @@ interface ChatHistory {
   component_outputs?: ComponentInChatHistory
 }
 
-const initialMessage = "Hello, I'm your Figma AI Assistant. How can I help you today? You can ask me about Figma documentation or request UI component designs for your projects."
+const initialMessage = "Hello, I'm your Figma AI Assistant. How can I help you today? You can ask me about Figma documentation or request UI component designs or images for your projects."
 
 const ExampleQuestions = [
-  'What are design files?',
   'How to use the toolbar?',
   'How to use local fonts on Figma?',
-  'Create a modern product card for my online store using blue (#3A5199) for buttons, yellow (#F8C630) for highlights, and white background with dark text? Include a product image, name, price, star rating, "Add to Cart" button, and save icon. Make it clean with rounded corners and subtle hover effects, and ensure it\'s responsive for mobile.'
+  'Can you help me find an image for a post about red lipstick? It should feature a women dressed nicely and wearing red listpick looking at the camera.',
+  'Can you create a detail card for a museum? It should contain the exhibition title, the start date, the category and the image. Make it minimal with a touch of pop overlay effect.'
 ]
 
 const LoadingSpinner = () => {

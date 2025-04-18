@@ -51,4 +51,4 @@ export const getImagesFromPexels = async (query: string) => {
     return response.json() as Promise<PexelsResponse>;
 }
 
-// Can you help me find an image for a post about red lipstick? It should feature a women dressed nicely and wearing red listpick looking at the camera
+// Can you help me find an image for a post about red lipstick? It should feature a women dressed nicely and wearing red listpick looking at the camera.
