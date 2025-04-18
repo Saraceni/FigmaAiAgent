@@ -110,7 +110,7 @@ export async function POST(req: Request) {
       messages,
       onFinish: (result) => {
 
-        console.log("onFinish");
+        console.log("onFinish", result.finishReason);
 
         if (process.env.ENVIRONMENT === 'dev') {
           console.log("Skipping chat save for dev session"); return;
@@ -127,7 +127,11 @@ export async function POST(req: Request) {
           // Get last message where role = 'user'
           const lastUserMessage = [...messages].reverse().find((message: any) => message.role === 'user').content;
 
-          saveChatToDb(lastUserMessage, response, modelId);
+          try {
+            saveChatToDb(lastUserMessage, response, modelId);
+          } catch (error) {
+            console.error("Error saving chat to database", error);
+          }
         }
       },
       tools: {
