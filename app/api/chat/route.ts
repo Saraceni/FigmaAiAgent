@@ -83,9 +83,10 @@ export async function POST(req: Request) {
         }
       }
 
-      console.log("Saving chat to database");
+      console.log("will call db.insert(chat)");
 
       db.insert(chat).values({ sessionId, response, modelId, question: lastUserMessage }).returning({ id: chat.id }).then((chat) => {
+        console.log("chat inserted", chat);
         if (generatedComponent) {
           db.insert(componentOutputs).values({
             chatId: chat[0].id, // Using the actual chat.id instead of sessionId
@@ -95,10 +96,14 @@ export async function POST(req: Request) {
             colorDetails: JSON.stringify(generatedComponent._metadata.colorDetails || {})
           }).catch((error) => {
             console.error("Error saving component to database", error);
+          }).finally(() => {
+            console.log("db.insert(componentOutputs) call finished");
           })
         }
       }).catch((error) => {
         console.error("Error saving chat to database", error);
+      }).finally(() => {
+        console.log("db.insert(chat) call finished");
       });
 
     };
@@ -118,7 +123,7 @@ export async function POST(req: Request) {
 
         if (result.finishReason === 'stop') {
 
-          console.log("Saving chat to database");
+          console.log("result.finishReason === 'stop'");
 
           // Get the answer:
           const response = result.text;
