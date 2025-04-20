@@ -9,7 +9,6 @@ import { chat } from '@/lib/db/schema/chat';
 import { eq } from 'drizzle-orm';
 import { callClaudeApi, ComponentOutput, ComponentOutputSchema } from '@/app/design/designAgent';
 import { componentOutputs } from '@/lib/db/schema/componentOutput';
-import EventEmitter from 'events';
 import { getImagesFromPexels } from '@/lib/images/pexels';
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 60;
