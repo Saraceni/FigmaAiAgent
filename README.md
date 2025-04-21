@@ -2,10 +2,13 @@
 
 This project implements an AI agent that utilizes Retrieval-Augmented Generation (RAG) to access the full documentation of Figma. The agent can efficiently retrieve and provide information from the documentation based on user queries. It also uses web scraping to get the latest information from the documentation.
 
+Other features include the ability to generate user interface componens with full CSS and HTML code and to search for images on Pexels.
+
 ## Overview
 
 The AI agent is designed to read and process the Figma Design documentation, allowing users to ask questions and receive accurate responses based on the official documentation. The project leverages embeddings to enhance the retrieval process, ensuring that the agent can quickly access relevant information.
 
+The AI agent also have access to tools to generate user interface componens with full CSS and HTML code and to search for images on Pexels.
 
 ## Features
 
@@ -14,6 +17,9 @@ The AI agent is designed to read and process the Figma Design documentation, all
 - **Multimodal**: The agent is capable to interpret images on the documentation and provide relevant images and gifs on the response.
 - **API Endpoint**: A GET endpoint that reads `urls.md`, which contains all URLs for the Figma Design documentation.
 - **Web Scraping**: The webscrapping API is available at `http://localhost:3000/api/figma`.
+- **Component Generation**: The agent can generate user interface componens with full CSS and HTML code.
+- **Image Search**: The agent can search for images on Pexels.
+
 ## Getting Started
 
 ### Prerequisites
@@ -24,6 +30,8 @@ The AI agent is designed to read and process the Figma Design documentation, all
 - A Firecrawl API key (<a href="https://www.firecrawl.dev/" target="_blank">https://www.firecrawl.dev/</a>)
 - A OpenAI API key (<a href="https://openai.com/index/openai-api/" target="_blank">https://openai.com/index/openai-api/</a>)
 - A Google Generative AI API key (<a href="https://cloud.google.com/ai/generative-ai" target="_blank">https://cloud.google.com/ai/generative-ai</a>)
+- A Pexels API key (<a href="https://www.pexels.com/api/documentation/" target="_blank">https://www.pexels.com/api/documentation/</a>)
+- A Claude API key (<a href="https://console.anthropic.com/settings/keys" target="_blank">https://console.anthropic.com/settings/keys</a>)
 
 ### Environment Variables
 
@@ -34,12 +42,17 @@ DATABASE_URL=<your_postgresql_database_url>
 OPENAI_API_KEY=<your_openai_api_key>
 FIRECRAWL_API_KEY=<your_firecrawl_api_key>
 GOOGLE_GENERATIVE_AI_API_KEY=<your_google_generative_ai_api_key>
+PEXELS_API_KEY=<your_pexels_api_key>
+ANTHROPIC_API_KEY=<your_claude_api_key>
 ```
 
 - **`DATABASE_URL`**: The connection string for your PostgreSQL database.
 - **`OPENAI_API_KEY`**: Your API key for accessing OpenAI services for chat and embeddings.
 - **`FIRECRAWL_API_KEY`**: The API key for the Firecrawl service used for web scraping.
 - **`GOOGLE_GENERATIVE_AI_API_KEY`**: The API key for the Google Generative AI service used for image description.
+- **`PEXELS_API_KEY`**: The API key for the Pexels service used for image search.
+- **`ANTHROPIC_API_KEY`**: The API key for the Claude service used for image description.
+
 ### Installation
 
 1. Clone the repository:
@@ -104,7 +117,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Acknowledgments
 
 - [Figma](https://figma.com/) for their excellent documentation.
-- [OpenAI](https://openai.com/) for the inspiration behind the RAG approach.
+- [OpenAI](https://openai.com/) for the assistant.
+- [Claude](https://anthropic.com/) for the code generation.
+- [Pexels](https://pexels.com/) for the images.
 
 
 # This project was bootsrapped with the Vercel AI SDK RAG Guide Starter Project
