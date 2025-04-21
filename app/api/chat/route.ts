@@ -7,6 +7,7 @@ import { getMediasDescriptionFromUrl } from '@/lib/actions/media';
 import { db } from '@/lib/db';
 import { chat } from '@/lib/db/schema/chat';
 import { eq } from 'drizzle-orm';
+import { waitUntil } from '@vercel/functions'
 import { callClaudeApi, ComponentOutput, ComponentOutputSchema } from '@/app/design/designAgent';
 import { componentOutputs } from '@/lib/db/schema/componentOutput';
 import { getImagesFromPexels } from '@/lib/images/pexels';
@@ -84,7 +85,7 @@ export async function POST(req: Request) {
 
       console.log("will call db.insert(chat)");
 
-      db.insert(chat).values({ sessionId, response, modelId, question: lastUserMessage }).returning({ id: chat.id }).then((chat) => {
+      waitUntil(db.insert(chat).values({ sessionId, response, modelId, question: lastUserMessage }).returning({ id: chat.id }).then((chat) => {
         console.log("chat inserted", chat);
         if (generatedComponent) {
           db.insert(componentOutputs).values({
@@ -103,7 +104,7 @@ export async function POST(req: Request) {
         console.error("Error saving chat to database", error);
       }).finally(() => {
         console.log("db.insert(chat) call finished");
-      });
+      }));
 
     };
 

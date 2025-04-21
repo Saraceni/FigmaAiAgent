@@ -71,6 +71,9 @@ importers:
       '@vercel/analytics':
         specifier: ^1.4.1
         version: 1.5.0(next@14.2.4(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+      '@vercel/functions':
+        specifier: ^2.0.0
+        version: 2.0.0
       ai:
         specifier: ^4.1.61
         version: 4.1.61(react@18.3.1)(zod@3.24.2)
@@ -1414,6 +1417,15 @@ packages:
       vue:
         optional: true
       vue-router:
+        optional: true
+
+  '@vercel/functions@2.0.0':
+    resolution: {integrity: sha512-BSwIihLHoV18gerKZJyGuqd3rtaYM6rJvET1kOwKktshucyaHXTJel7Cxegs+sdX0NZqsX4LO2MFnMU2jG01Cw==}
+    engines: {node: '>= 18'}
+    peerDependencies:
+      '@aws-sdk/credential-provider-web-identity': '*'
+    peerDependenciesMeta:
+      '@aws-sdk/credential-provider-web-identity':
         optional: true
 
   abort-controller@3.0.0:
@@ -4591,6 +4603,8 @@ snapshots:
     optionalDependencies:
       next: 14.2.4(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
+
+  '@vercel/functions@2.0.0': {}
 
   abort-controller@3.0.0:
     dependencies:
