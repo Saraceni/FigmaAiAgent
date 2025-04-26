@@ -117,7 +117,7 @@ export default function Chat() {
               <p className="font-afacad text-sm md:text-base text-[#232323]">Ask Figma documentation and get answers in seconds.</p>
             </div>
           </div>
-          {chatHistory.length === 0 && <div className='flex items-center justify-center w-[36px] h-[36px] rounded-full bg-white/30 cursor-pointer hover:bg-white/50 ml-auto' onClick={handleShare}>
+          {chatHistory.length === 0 && <div className='flex items-center justify-center w-[36px] h-[36px] rounded-full bg-white/30 cursor-pointer hover:bg-white/50 ml-auto flex-shrink-0' onClick={handleShare}>
             <FaShareAlt className="text-[#232323]" />
           </div>}
         </div>
@@ -149,13 +149,17 @@ export default function Chat() {
                 </div>
               </motion.div>
             ))}
-            {messages.length === 0 && chatHistory.length === 0 && !isLoadingChatHistory && ExampleQuestions.map(q => (
-              <motion.div key={q} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.5 }}>
-                <div className="whitespace-pre-wrap z-2 bg-[#474d5dcc] rounded-md p-[10px] text-[#ababab] text-center shadow-md cursor-pointer hover:bg-[#474d5dcc]/90 hover:text-[#ababab]/90" onClick={() => append({ role: 'user', content: q })}>
-                  {q}
-                </div>
-              </motion.div>
-            ))}
+            {messages.length === 0 && chatHistory.length === 0 && !isLoadingChatHistory && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {ExampleQuestions.map(q => (
+                  <motion.div key={q} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.5 }} className="h-full">
+                    <div className="whitespace-pre-wrap z-2 bg-black rounded-lg p-[10px] text-[#ababab] text-center shadow-md cursor-pointer hover:bg-[#474d5dcc]/90 hover:text-[#ababab]/90 h-full flex items-center justify-center" onClick={() => append({ role: 'user', content: q })}>
+                      {q}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
             {error && <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.5 }}>
               <div className="whitespace-pre-wrap z-2 bg-red-400/90 rounded-md p-[10px] text-red-950 text-center shadow-md cursor-pointer flex flex-col items-center justify-center">
                 <div className="flex items-center justify-center space-x-2">
