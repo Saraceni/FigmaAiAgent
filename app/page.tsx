@@ -36,7 +36,7 @@ const initialMessage = "Hello, I'm your Figma AI Assistant. How can I help you t
 
 const ExampleQuestions = [
   'How to use the toolbar?',
-  'How to use local fonts on Figma?',
+  'Make an svg component that has a rounded white triangle with a circle cut out of it and ocean waves int it',
   'Can you help me find an image for a post about red lipstick? It should feature a women dressed nicely and wearing red listpick looking at the camera.',
   'Can you create a detail card for a museum? It should contain the exhibition title, the start date, the category and the image. Make it minimal with a touch of pop overlay effect.'
 ]

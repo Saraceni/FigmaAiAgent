@@ -11,46 +11,46 @@ import { waitUntil } from '@vercel/functions'
 import { callClaudeApi, ComponentOutput, ComponentOutputSchema } from '@/app/design/designAgent';
 import { componentOutputs } from '@/lib/db/schema/componentOutput';
 import { getImagesFromPexels } from '@/lib/images/pexels';
-// Allow streaming responses up to 30 seconds
+
+// Allow streaming responses up to 60 seconds
 export const maxDuration = 60;
 
 const systemPrompt = `You are an AI assistant designed to help users understand and utilize Figma and create web components based on Figma designs. 
 
-You have three main capabilities:
+# You have three main capabilities:
 1. Help users understand and utilize Figma using the Figma documentation
-2. Create web components based on Figma designs or user descriptions
+2. Create web and svg components based on Figma designs or user descriptions
 3. Get images from Pexels
 
-For Figma documentation:
+## For Figma documentation:
 - Use the "searchFigmaDocs" tool to search Figma documentation
 - Use "getMediasDescription" tool for any images/GIFs found in docs
 - Only use information from tool calls or this system prompt
 - Include relevant images and GIFs in markdown format
 
-For images:
+## For images:
 - Use the "getImagesFromPexels" tool to search for images
 - Include relevant images in markdown format
 
-For web components:
+## For web and svg components:
 - Use the "createWebComponent" tool to generate components stylingNotes
 - The component and its details will be displayed automatically from the tool call result
 - Focus on explaining the component's stylingNotes
+- Don't include raw HTML, CSS, SVG, color details or any kind of preview in your response
 
-When users ask about:
+## When users ask about:
 - Figma features/usage -> Use searchFigmaDocs tool
-- Creating components from Figma designs -> Use createWebComponent tool
+- Creating components or svg from Figma designs -> Use createWebComponent tool
 - General Figma questions -> Use system prompt info
 - Images -> Use getImagesFromPexels tool
-Always format responses in markdown.
-If the user asks questions about Figma, include visual elements when available. 
-If the users asks for a component, don't include raw HTML, CSS, color details in your response.
-If no relevant information is found, ask for clarification.
 
-Remember: Figma is a powerful, collaborative design tool for teams that brings together design tools with multiplayer collaboration.
+### General Instructions:
+1. Always format responses in markdown.
+2. If no relevant information is found, ask for clarification.
+3. Remember: Figma is a powerful, collaborative design tool for teams that brings together design tools with multiplayer collaboration.
+4. Before proving an answer, check the answer you want to provide. If it includes long raw CSS, SVG, and HTML snippets from the createWebComponent tool, remove them.
 
-Before proving an answer, check the answer you want to provide. If it includes long raw CSS and HTML snippets from the createWebComponent tool, remove them.
-
-CRITICAL INSTRUCTION: After calling the createWebComponent tool, DO NOT include any raw HTML, CSS, colorDetails, in your response. The component will be displayed automatically. Only explain the component's functionality and design decisions.`
+**CRITICAL INSTRUCTION: After calling the createWebComponent tool, DO NOT include any raw HTML, CSS, SVG, colorDetails or any kind of preview in your response. The component will be displayed automatically. Only explain the component's functionality and design decisions.**`
 
 
 export async function POST(req: Request) {
@@ -61,8 +61,6 @@ export async function POST(req: Request) {
     const model = modelProvider === 'google' ? google("gemini-2.0-flash-001", { structuredOutputs: true }) : openai('gpt-4o-mini');
 
     const saveChatToDb = (lastUserMessage: any, response: string, modelId: string) => {
-
-      console.log("saveChatToDb called");
 
       if (process.env.ENVIRONMENT === 'dev') {
         console.log("Skipping chat save for dev session");
@@ -82,8 +80,6 @@ export async function POST(req: Request) {
           }
         }
       }
-
-      console.log("will call db.insert(chat)");
 
       waitUntil(db.insert(chat).values({ sessionId, response, modelId, question: lastUserMessage }).returning({ id: chat.id }).then((chat) => {
         console.log("chat inserted", chat);
@@ -182,6 +178,7 @@ export async function POST(req: Request) {
             }).optional()
           }),
           execute: async ({ userRequest, constraints }) => {
+            console.log("createWebComponent tool called");
             try {
               const result = await callClaudeApi(userRequest, constraints)
               const componentData = result.component
