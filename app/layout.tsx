@@ -7,8 +7,8 @@ import { Toaster } from "@/components/ui/sonner"
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Figma AI Assistant",
-  description: "Get instant answers to Figma questions. Automate the creation of UI components",
+  title: "Figma AI Assistant | Instant Design Help & UI Automation",
+  description: "Get expert answers to Figma questions and automate UI component creation. Design smarter and faster with AI-powered assistance for all skill levels.",
   keywords: ["Figma", "AI", "UI design", "design automation", "UI components", "design assistant"],
   authors: [{ name: "Rafael Saraceni", url: "https://saraceni.me/" }],
   creator: "Rafael Saraceni",
@@ -31,8 +31,8 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Figma AI Assistant",
-    description: "Get instant answers to Figma questions. Automate the creation of UI components",
+    title: "Figma AI Assistant | Instant Design Help & UI Automation",
+    description: "Get expert answers to Figma questions and automate UI component creation. Design smarter and faster with AI-powered assistance for all skill levels.",
     url: "https://figma-ai-agent.vercel.app/", // Replace with your actual URL
     images: [
       {
@@ -54,8 +54,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Figma AI Assistant",
-    description: "Get instant answers to Figma questions. Automate the creation of UI components",
+    title: "Figma AI Assistant | Instant Design Help & UI Automation",
+    description: "Get expert answers to Figma questions and automate UI component creation. Design smarter and faster with AI-powered assistance for all skill levels.",
     images: ['/app_preview.png'],
     creator: "@saraceni_br",
     site: "@saraceni_br",
