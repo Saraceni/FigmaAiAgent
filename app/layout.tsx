@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { Analytics } from '@vercel/analytics/next';
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner"
+import Script from 'next/script'
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -74,6 +75,18 @@ export default function RootLayout({
         <Toaster />
         <Analytics />
       </body>
+      <Script src="https://scripts.simpleanalyticscdn.com/latest.js" />
     </html>
   );
 }
+
+
+
+// Long description 1
+// Figma AI Assistant transforms how designers work by providing instant answers to Figma questions and automating UI component creation. Skip the learning curve and design documentation—simply ask and create. Whether you're troubleshooting design issues, seeking best practices, or wanting to generate components on the fly, this AI-powered tool streamlines your workflow and boosts productivity. Elevate your Figma experience with intelligent assistance that helps you design smarter, not harder.
+
+// Lomg description 2
+// Figma AI Assistant is your intelligent design companion that provides instant answers to all your Figma questions while automating UI component creation. It eliminates hours of searching through documentation and tutorials, allowing you to focus on what matters—creating exceptional designs. Perfect for both beginners and professionals, this tool helps you overcome technical hurdles, implement best practices, and accelerate your workflow with AI-powered guidance. Design smarter and faster with Figma AI Assistant.
+
+// Short description
+// Figma AI Assistant delivers instant answers to your Figma questions and automates UI component creation. Skip the documentation and design faster with AI-powered guidance. Perfect for beginners and professionals alike, it's your intelligent companion for streamlining workflows and enhancing productivity.
