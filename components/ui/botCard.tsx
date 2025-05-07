@@ -3,11 +3,8 @@ import ReactMarkdown from 'react-markdown';
 import { PiCoffeeFill } from "react-icons/pi";
 import { MdImageSearch, MdWeb } from "react-icons/md";
 import Image from 'next/image';
-import ColorPalleteCard from '@/app/design/colorPalleteCard';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ComponentOutput } from '@/app/design/designAgent';
 import { ComponentInChatHistory } from '@/app/page';
-import { FaClipboard } from "react-icons/fa";
 import { GeneratedComponent } from './generatedComponent';
 
 
