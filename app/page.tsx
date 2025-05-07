@@ -11,6 +11,7 @@ import { TbFaceIdError } from "react-icons/tb";
 import { generateId } from 'ai';
 import { toast } from "sonner"
 import { Button } from '@/components/ui/button';
+import { saEvent } from './analytics';
 
 export interface ComponentInChatHistory {
   id: string;
@@ -121,6 +122,7 @@ export default function Chat() {
   }, []);
 
   const handleShare = () => {
+    saEvent('share_link_button_clicked');
     const shareUrl = `${window.location.origin}?sessionId=${sessionId}`;
     navigator.clipboard.writeText(shareUrl);
     toast("Share link copied to clipboard!")
@@ -218,6 +220,7 @@ export default function Chat() {
         {chatHistory.length > 0 && <div className="fixed bottom-0 right-2 left-2 md:mx-auto md:max-w-screen-sm lg:max-w-screen-md p-2 mb-4 md:mb-8 flex items-center justify-center">
           <Button
             onClick={() => {
+              saEvent('new_chat_button_clicked');
               setChatHistory([]);
               setSessionId(generateId());
               window.history.pushState({}, '', '/');
