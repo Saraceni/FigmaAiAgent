@@ -1,10 +1,11 @@
 import ColorPalleteCard from '@/app/design/colorPalleteCard';
 import { ComponentOutput } from '@/app/design/designAgent';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { FaClipboard } from 'react-icons/fa';
+import { FaClipboard, FaSpinner } from 'react-icons/fa';
 import { cacheUtils } from '@/app/cache';
 import { Button } from './button';
 import { saEvent } from '@/app/analytics';
+import { useState } from 'react';
 
 function HtmlRenderer({ htmlContent, cssContent }: { htmlContent: string, cssContent: string }) {
     return (
@@ -38,6 +39,9 @@ function HtmlRenderer({ htmlContent, cssContent }: { htmlContent: string, cssCon
 }
 
 export const GeneratedComponent = ({ id, generatedComponent, onCopyToClipboard }: { id: string, generatedComponent: ComponentOutput, onCopyToClipboard: (clipboardData: string) => void }) => {
+    
+    const [isLoading, setIsLoading] = useState(false);
+
     return <div className="w-full h-full mb-2 border border-gray-300 rounded-md bg-gray-50">
         <div className="w-full overflow-y-auto h-full p-1">
             <Tabs defaultValue="preview" className="w-full h-full">
@@ -58,18 +62,6 @@ export const GeneratedComponent = ({ id, generatedComponent, onCopyToClipboard }
                                 <ColorPalleteCard key={index} color={color} />
                             ))}
                         </div>
-                        {/* <div className="mt-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <h3 className="text-lg font-semibold mb-3 text-gray-800">Design Notes</h3>
-              <div className="prose prose-sm max-w-none text-gray-700">
-                {generatedComponent.stylingNotes.split('\n').map((paragraph, index) => (
-                  paragraph.trim() ? (
-                    <p key={index} className="mb-2">
-                      {paragraph}
-                    </p>
-                  ) : null
-                ))}
-              </div>
-            </div> */}
                     </div>
                 </TabsContent>
                 <TabsContent value="css">
@@ -86,8 +78,9 @@ export const GeneratedComponent = ({ id, generatedComponent, onCopyToClipboard }
         </div>
         <div className='flex items-center justify-center p-3 border-t border-gray-200'>
             <Button
+                disabled={isLoading}
                 onClick={async () => {
-
+                    setIsLoading(true);
                     saEvent('copy_to_figma_button_clicked');
                     const cacheKey = `generatedComponent-${id}`;
 
@@ -113,12 +106,14 @@ export const GeneratedComponent = ({ id, generatedComponent, onCopyToClipboard }
                     } catch (error) {
                         console.error('Error copying to Figma:', error);
                         alert('Failed to copy component to Figma. Please try again.');
+                    } finally {
+                        setIsLoading(false);
                     }
                 }}
                 className="py-2 px-4 rounded-md bg-blue-500 hover:bg-blue-600 text-white"
             >
-                <div className='flex items-center gap-2 animate-pulse hover:animate-none'>
-                    <FaClipboard />
+                <div className='flex items-center gap-2'>
+                    {isLoading ? <FaSpinner className='animate-spin' /> : <FaClipboard />}
                     <span>Copy to Figma</span>
                 </div>
             </Button>
