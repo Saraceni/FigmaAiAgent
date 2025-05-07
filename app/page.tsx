@@ -6,7 +6,7 @@ import { BotCard } from '@/components/ui/botCard';
 import { FaPaperPlane, FaPlus, FaRobot, FaShareAlt } from 'react-icons/fa';
 import Image from 'next/image';
 import { motion } from "motion/react"
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { TbFaceIdError } from "react-icons/tb";
 import { generateId } from 'ai';
 import { toast } from "sonner"
@@ -60,6 +60,26 @@ export default function Chat() {
   const [chatHistory, setChatHistory] = useState<ChatHistory[]>([]);
   const [isLoadingChatHistory, setIsLoadingChatHistory] = useState(false);
   const { messages, input, handleInputChange, handleSubmit, append, isLoading } = useChat({ maxSteps: 5, onError: () => setError(true), body: { sessionId } });
+  const clipboardDataRef = useRef<string | null>(null);
+
+  // Set up the clipboard event listener
+  useEffect(() => {
+    const handleCopy = (e: ClipboardEvent) => {
+      if (clipboardDataRef.current) {
+        e.clipboardData?.setData('text/html', clipboardDataRef.current);
+        e.preventDefault();
+        toast("Component copied! You can now paste directly into Figma");
+        clipboardDataRef.current = null;
+      }
+    };
+    
+    document.addEventListener('copy', handleCopy);
+    
+    // Clean up the event listener when component unmounts
+    return () => {
+      document.removeEventListener('copy', handleCopy);
+    };
+  }, []);
 
   const getChatHistory = async (sessionId: string) => {
     try {
@@ -106,6 +126,14 @@ export default function Chat() {
     toast("Share link copied to clipboard!")
   }
 
+  const onCopyToClipboard = (clipboardData: string) => {
+    // Store the data in the ref
+    clipboardDataRef.current = clipboardData;
+    
+    // Trigger the copy command
+    document.execCommand('copy');
+  };
+
   return (
     <div className="flex flex-col w-screen h-screen stretch overflow-hidden bg-[url('/background_full.jpg')] bg-cover bg-center relative">
       <div className="flex items-center justify-center w-full space-y-1 backdrop-blur-md absolute top-0 right-0 left-0 z-10 bg-white/30">
@@ -114,7 +142,7 @@ export default function Chat() {
             <Image src='/robot.png' alt='logo' width={50} height={50} />
             <div className="flex flex-col ml-4 md:ml-2 pb-1">
               <h1 className="font-gabarito text-xl md:text-3xl font-bold text-black">Figma AI Assistant</h1>
-              <p className="font-afacad text-sm md:text-base text-[#232323]">Ask Figma documentation and get answers in seconds.</p>
+              <p className="font-afacad text-sm md:text-base text-[#232323]">Get expert answers to Figma questions and automate UI component creation.</p>
             </div>
           </div>
           {chatHistory.length === 0 && <div className='flex items-center justify-center w-[36px] h-[36px] rounded-full bg-white/30 cursor-pointer hover:bg-white/50 ml-auto flex-shrink-0' onClick={handleShare}>
@@ -145,7 +173,7 @@ export default function Chat() {
             {messages.map(m => (
               <motion.div key={m.id} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.5 }}>
                 <div className="whitespace-pre-wrap z-2">
-                  {m.role === 'user' ? <UserCard message={m} /> : <BotCard message={m} />}
+                  {m.role === 'user' ? <UserCard message={m} /> : <BotCard message={m} onCopyToClipboard={onCopyToClipboard} />}
                 </div>
               </motion.div>
             ))}
