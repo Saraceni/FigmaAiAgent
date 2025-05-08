@@ -52,6 +52,34 @@ const systemPrompt = `You are an AI assistant designed to help users understand 
 
 **CRITICAL INSTRUCTION: After calling the createWebComponent tool, DO NOT include any raw HTML, CSS, SVG, colorDetails or any kind of preview in your response. The component will be displayed automatically. Only explain the component's functionality and design decisions.**`
 
+const saveToDbPromise = (sessionId: string, lastUserMessage: any, response: string, modelId: string, generatedComponent: ComponentOutput | null) => {
+  return new Promise((resolve, reject) => {
+    db.insert(chat).values({ sessionId, response, modelId, question: lastUserMessage }).returning({ id: chat.id }).then((chat) => {
+      console.log("chat inserted", chat);
+      if (generatedComponent) {
+        db.insert(componentOutputs).values({
+          chatId: chat[0].id, // Using the actual chat.id instead of sessionId
+          html: generatedComponent._metadata.html,
+          css: generatedComponent._metadata.css,
+          stylingNotes: generatedComponent.stylingNotes || '',
+          colorDetails: JSON.stringify(generatedComponent._metadata.colorDetails || {})
+        }).then(() => {
+          console.log("component saved to database");
+          resolve(chat[0].id);
+        }).catch((error) => {
+          console.error("Error saving component to database", error);
+          reject(error);
+        })
+      } else {
+        console.log("no component to save");
+        resolve(chat[0].id);
+      }
+    }).catch((error) => {
+      console.error("Error saving chat to database", error);
+      reject(error);
+    })
+  });
+}
 
 export async function POST(req: Request) {
 
@@ -81,26 +109,7 @@ export async function POST(req: Request) {
         }
       }
 
-      waitUntil(db.insert(chat).values({ sessionId, response, modelId, question: lastUserMessage }).returning({ id: chat.id }).then((chat) => {
-        console.log("chat inserted", chat);
-        if (generatedComponent) {
-          db.insert(componentOutputs).values({
-            chatId: chat[0].id, // Using the actual chat.id instead of sessionId
-            html: generatedComponent._metadata.html,
-            css: generatedComponent._metadata.css,
-            stylingNotes: generatedComponent.stylingNotes || '',
-            colorDetails: JSON.stringify(generatedComponent._metadata.colorDetails || {})
-          }).catch((error) => {
-            console.error("Error saving component to database", error);
-          }).finally(() => {
-            console.log("db.insert(componentOutputs) call finished");
-          })
-        }
-      }).catch((error) => {
-        console.error("Error saving chat to database", error);
-      }).finally(() => {
-        console.log("db.insert(chat) call finished");
-      }));
+      waitUntil(saveToDbPromise(sessionId, lastUserMessage, response, modelId, generatedComponent));
 
     };
 
