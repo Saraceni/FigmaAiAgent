@@ -11,6 +11,7 @@ import { waitUntil } from '@vercel/functions'
 import { callClaudeApi, ComponentOutput, ComponentOutputSchema } from '@/app/design/designAgent';
 import { componentOutputs } from '@/lib/db/schema/componentOutput';
 import { getImagesFromPexels } from '@/lib/images/pexels';
+import { getImagesFromGoogle } from '@/lib/google/getImagesFromGoogle';
 
 // Allow streaming responses up to 60 seconds
 export const maxDuration = 60;
@@ -29,8 +30,9 @@ const systemPrompt = `You are an AI assistant designed to help users understand 
 - Include relevant images and GIFs in markdown format
 
 ## For images:
-- Use the "getImagesFromPexels" tool to search for images
+- Use the "getImagesFromGoogle" tool to search for images
 - Include relevant images in markdown format
+- Include the source of the image in the markdown format
 
 ## For web and svg components:
 - Use the "createWebComponent" tool to generate components stylingNotes
@@ -42,7 +44,7 @@ const systemPrompt = `You are an AI assistant designed to help users understand 
 - Figma features/usage -> Use searchFigmaDocs tool
 - Creating components or svg from Figma designs -> Use createWebComponent tool
 - General Figma questions -> Use system prompt info
-- Images -> Use getImagesFromPexels tool
+- Images -> Use getImagesFromGoogle tool
 
 ### General Instructions:
 1. Always format responses in markdown.
@@ -164,14 +166,22 @@ export async function POST(req: Request) {
             return getMediasDescriptionFromUrl(urls)
           },
         },
-        getImagesFromPexels: {
-          description: 'Get images from Pexels',
+        // getImagesFromPexels: {
+        //   description: 'Get images from Pexels',
+        //   parameters: z.object({
+        //     query: z.string().describe('the query to search for'),
+        //   }),
+        //   execute: async ({ query }) => {
+        //     return getImagesFromPexels(query)
+        //   },
+        // },
+        getImagesFromGoogle: {
           parameters: z.object({
             query: z.string().describe('the query to search for'),
           }),
           execute: async ({ query }) => {
-            console.log("Getting images from Pexels");
-            return getImagesFromPexels(query)
+            console.log("Getting images from Google");
+            return getImagesFromGoogle(query)
           },
         },
         createWebComponent: {
