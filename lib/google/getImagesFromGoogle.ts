@@ -71,10 +71,6 @@ export interface GoogleImageSearchApiResult {
 
 export const getImagesFromGoogle = async (query: string) => {
     const queryUrlEncoded = encodeURI(query)
-    const response = await fetch(`https://www.googleapis.com/customsearch/v1?key=${process.env.GOOGLE_CUSTOM_SEARCH_ENGINE_API_KEY}&cx=${process.env.GOOGLE_CUSTOM_SEARCH_ENGINE_ID}&searchType=image&q=${queryUrlEncoded}`, {
-        headers: {
-            Authorization: process.env.PEXELS_API_KEY as string
-        }
-    });
+    const response = await fetch(`https://www.googleapis.com/customsearch/v1?key=${process.env.GOOGLE_CUSTOM_SEARCH_ENGINE_API_KEY}&cx=${process.env.GOOGLE_CUSTOM_SEARCH_ENGINE_ID}&searchType=image&q=${queryUrlEncoded}`);
     return response.json() as Promise<GoogleImageSearchApiResult>;
 }
