@@ -51,6 +51,7 @@ const systemPrompt = `You are an AI assistant designed to help users understand 
 2. If no relevant information is found, ask for clarification.
 3. Remember: Figma is a powerful, collaborative design tool for teams that brings together design tools with multiplayer collaboration.
 4. Before proving an answer, check the answer you want to provide. If it includes long raw CSS, SVG, and HTML snippets from the createWebComponent tool, remove them.
+5. Whenever a user asks to develop an app, site or a design, provide at least one component that can be used to develop the app, site or design.
 
 **CRITICAL INSTRUCTION: After calling the createWebComponent tool, DO NOT include any raw HTML, CSS, SVG, colorDetails or any kind of preview in your response. The component will be displayed automatically. Only explain the component's functionality and design decisions.**`
 
