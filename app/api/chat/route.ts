@@ -25,7 +25,8 @@ const systemPrompt = `You are an AI assistant designed to help users understand 
 
 ## For Figma documentation:
 - Use the "searchFigmaDocs" tool to search Figma documentation
-- Use "getMediasDescription" tool for any images/GIFs found in docs
+- Use "getMediasDescription" tool for any images found in docs to understand the image
+- Include as much visual information as possible in the response
 - Only use information from tool calls or this system prompt
 - Include relevant images and GIFs in markdown format
 

@@ -36,7 +36,7 @@ interface ChatHistory {
 const initialMessage = "Hello, I'm your Figma AI Assistant. How can I help you today? You can ask me about Figma documentation or request UI component designs or images for your projects."
 
 const ExampleQuestions = [
-  'How to use the toolbar?',
+  'What are the main interface elements of a file in Figma?',
   'Make an svg component that has a rounded white triangle with a circle cut out of it and ocean waves int it',
   'Can you help me find an image for a post about red lipstick? It should feature a women dressed nicely and wearing red listpick looking at the camera.',
   'Can you create a detail card for a museum? It should contain the exhibition title, the start date, the category and the image. Make it minimal with a touch of pop overlay effect.'
