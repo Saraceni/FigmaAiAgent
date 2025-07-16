@@ -31,12 +31,28 @@ export async function GET(req: Request) {
             // Get the url of the images and gifs from the resource
             // These urls are in the format: [name](https://help.figma.com/hc/article_attachments/{id})
             const extractedData = resource[0].content.match(/\[[^\[\]]+\]\(https:\/\/help\.figma\.com\/hc\/article_attachments\/(\d+)\)/g);
-            console.log("Extracted data: ", extractedData);
+            
             // Now I need to verify if in [name] part there is .svg 
             const extractedDataWithoutSvg = extractedData?.filter(item => !item.includes('.svg') && item.includes('article_attachments'));
             // Now I need to remove the [name] part and keep only the url
-            const imagesAndGifsUrls = extractedDataWithoutSvg?.map(item => item.split('](')[1].replace(')', ''));
-            if (imagesAndGifsUrls) {
+            const extractedUrlsFromArticleAttachments = extractedDataWithoutSvg?.map(item => item.split('](')[1].replace(')', ''));
+
+            // resource[0].content is a markdown content. I need to extract all the urls in this markdown that ends with .png
+            // THey only need to be an url and end with png. thats it. i need a regex that is able to extract this
+            const urlsThatEndWithPng = resource[0].content.match(/\bhttps?:\/\/\S+\.png\b/g);
+            const urlsThatEndWithPngAndAreNotArticleAttachments = urlsThatEndWithPng?.filter(item => !item.includes('article_attachments'));
+            console.log("urlsThatEndWithPngAndAreNotArticleAttachments: ", urlsThatEndWithPngAndAreNotArticleAttachments);
+
+            var imagesAndGifsUrls: string[] = []
+            if(extractedUrlsFromArticleAttachments) {
+                imagesAndGifsUrls = [...imagesAndGifsUrls, ...extractedUrlsFromArticleAttachments]
+            }
+            if(urlsThatEndWithPngAndAreNotArticleAttachments) {
+                imagesAndGifsUrls = [...imagesAndGifsUrls, ...urlsThatEndWithPngAndAreNotArticleAttachments]
+            }
+            
+
+            if (imagesAndGifsUrls.length > 0) {
                 // Get all media from the resource
                 const allResourceMedia = await db.select().from(media).where(eq(media.resourceId, resource[0].id));
                 if(imagesAndGifsUrls.length === allResourceMedia.length) {
@@ -62,6 +78,12 @@ export async function GET(req: Request) {
                         } else if(error instanceof Error && error.message === "File too large") {
                             // This is fine, we can ignore it
                             console.error("Caught a file too large error:", error.message);
+                        } else if(error instanceof Error && error.message === "GIF not supported") {
+                            // This is fine, we can ignore it
+                            console.error("Caught a GIF not supported error:", error.message);
+                        } else if (error instanceof Error && error.message == "Failed to fetch image or gif") {
+                            // This is fine, we can ignore it
+                            console.error("Caught a failed to fetch image or gif error:", error.message);
                         } else {
                             console.error("An error occurred:", error);
                             // This is not fine, we need to throw an error

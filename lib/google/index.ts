@@ -24,6 +24,7 @@
 
 import { GoogleAIFileManager, FileState, FileMetadataResponse } from "@google/generative-ai/server";
 import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
+import { GoogleGenAI } from '@google/genai';
 import fs from "fs";
 
 // Converts local file information to base64
@@ -143,12 +144,16 @@ export const describeImageOrGifFromResource = async (fileURL: string, resourceTi
     }
 
     const { mimeType, buffer } = await fetch(fileURL, { cache: 'no-store' }).then((response) => {
-        if (!response.ok) throw new Error("Failed to fetch image or gif");
+        if (!response.ok) {
+            console.error("Failed to fetch image or gif", fileURL);
+            throw new Error("Failed to fetch image or gif");
+        }
         return response.arrayBuffer().then((buffer) => {
             const mimeType = response.headers.get('Content-Type');
             // If the file has more than 20971520 bytes I can't upload it to google
-            if(mimeType === 'image/svg+xml') throw new Error("SVG not supported");
-            if(buffer.byteLength > 17000000) throw new Error("File too large");
+            if (mimeType === 'image/svg+xml') throw new Error("SVG not supported");
+            if (mimeType === 'image/gif') throw new Error("GIF not supported");
+            if (buffer.byteLength > 17000000) throw new Error("File too large");
             return { mimeType, buffer };
         })
     });
@@ -164,24 +169,38 @@ export const describeImageOrGifFromResource = async (fileURL: string, resourceTi
     The resource title is ${resourceTitle} and the resource description is ${resourceDescription}.
     Answer with just the description, no other text.`
 
-    const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY);
-
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-
-    const result = await model.generateContent([
+    const genAI = new GoogleGenAI({ apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY }); //new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY);
+    const base64Data = Buffer.from(buffer).toString("base64");
+    const contents = [
         {
             inlineData: {
-                data: Buffer.from(buffer).toString("base64"),
-                mimeType
+                mimeType,
+                data: base64Data,
             },
         },
-        prompt
-    ]);
+        { text: prompt },
+    ];
+
+    const response = await genAI.models.generateContent({
+        model: "gemini-2.0-flash",
+        contents,
+    });
+
+    // const result = await model.generateContent([
+    //     {
+    //         inlineData: {
+    //             data: Buffer.from(buffer).toString("base64"),
+    //             mimeType
+    //         },
+    //     },
+    //     prompt
+    // ]);
 
     // Handle the response of generated text
-    console.log(result.response.text())
+    console.log(response.text)
+    if (!response.text) throw new Error("Failed to generate description");
 
-    return { mimeType, description: result.response.text() };
+    return { mimeType, description: response.text };
 }
 
 

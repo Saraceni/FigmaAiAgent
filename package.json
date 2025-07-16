@@ -13,7 +13,9 @@
     "db:pull": "drizzle-kit introspect",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "db:check": "drizzle-kit check"
+    "db:check": "drizzle-kit check",
+    "verify:urls": "tsx scripts/verifyUrlsOnContent.ts",
+    "update-resource": "dotenv -- tsx scripts/updateResource.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^1.1.17",
@@ -21,6 +23,7 @@
     "@ai-sdk/openai": "^1.1.9",
     "@ai-sdk/react": "^1.1.11",
     "@anthropic-ai/sdk": "^0.39.0",
+    "@google/genai": "^0.14.0",
     "@google/generative-ai": "^0.21.0",
     "@mendable/firecrawl-js": "^1.16.0",
     "@neondatabase/serverless": "^1.0.0",
@@ -42,6 +45,7 @@
     "axios": "^1.7.9",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "dotenv-cli": "^8.0.0",
     "drizzle-orm": "^0.42.0",
     "drizzle-zod": "^0.5.1",
     "form-data": "^4.0.1",

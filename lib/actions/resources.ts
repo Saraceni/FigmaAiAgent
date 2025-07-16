@@ -27,5 +27,5 @@ export const createResource = async (input: NewResourceParams) => {
     })),
   );
 
-  return 'Resource successfully created and embedded.';
+  return resource;
 };

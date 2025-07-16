@@ -92,6 +92,7 @@ export const generateEmbedding = async (value: string): Promise<number[]> => {
 };
 
 export const findRelevantContent = async (userQuery: string, source: string) => {
+    var log = false
     try {
         const userQueryEmbedded = await generateEmbedding(userQuery);
         const similarity = sql<number>`1 - (${cosineDistance(
@@ -99,39 +100,88 @@ export const findRelevantContent = async (userQuery: string, source: string) => 
             userQueryEmbedded,
         )})`;
         const similarEmbeddings = await db
-            .select({ content: embeddings.content, similarity, resourceId: resources.id, resourceContent: resources.content, resourceTitle: resources.title, resourceDescription: resources.description })
+            .select({ embeddingId: embeddings.id, content: embeddings.content, similarity, resourceId: resources.id, resourceContent: resources.content, resourceTitle: resources.title, resourceDescription: resources.description })
             .from(embeddings)
             .innerJoin(resources, eq(embeddings.resourceId, resources.id)) // Join the resources table
             .where(and(gt(similarity, 0.7), eq(resources.source, source)))
             .orderBy(t => desc(t.similarity))
-            .limit(4)
+            .limit(10)
+
         var tokenCount = 0
-        var result: { content: string, id: string, title: string, description: string }[] = []
-        // Sort embedding by similarity. Bigger similarity is better.
-        similarEmbeddings.sort((a, b) => b.similarity - a.similarity);
+        var result: { content: string, id: string, title: string, description: string, contentSource: 'resource' | 'embedding' | 'hybrid' }[] = []
+        var processedResources = new Set<string>()
+
+        // First pass: Add the most relevant embeddings
         for (const embedding of similarEmbeddings) {
-            // Check if the resource is already in the result
+            if (processedResources.has(embedding.resourceId)) continue;
+
+            if (tokenCount + embedding.content.length <= MAX_TOKEN_COUNT) {
+                result.push({
+                    content: embedding.content,
+                    id: embedding.embeddingId,
+                    title: embedding.resourceTitle,
+                    description: embedding.resourceDescription,
+                    contentSource: 'embedding'
+                })
+                tokenCount += embedding.content.length
+                processedResources.add(embedding.resourceId)
+            } else {
+                break
+            }
+        }
+
+        // Second pass: For high-similarity embeddings, try to add context from the full resource
+        for (const embedding of similarEmbeddings) {
+            if (embedding.similarity < 0.85) continue; // Only for very high similarity
+            
             const resourceContentWithExtraLinesRemoved = embedding.resourceContent.replaceAll('\n\n', '\n').replaceAll('\n\n\n', '\n')
-            if (!result.find(r => r.id === embedding.resourceId)) {
-                // Check if the resource token count will exceed max token count
-                if(tokenCount + resourceContentWithExtraLinesRemoved.length > MAX_TOKEN_COUNT) {
-                    console.log(`Resource ${embedding.resourceTitle} token count will exceed max token count: current count ${tokenCount}`)
-                    // Check if the embedding token count will not exceed max token count
-                    if(tokenCount + embedding.content.length < MAX_TOKEN_COUNT) {
-                        console.log(`Embedding ${embedding.resourceTitle} token count will not exceed max token count: current count ${tokenCount}`)
-                        result.push({ content: embedding.content, id: embedding.resourceId, title: embedding.resourceTitle, description: embedding.resourceDescription })
-                        tokenCount += embedding.content.length
-                    } else {
-                        console.log(`Resource ${embedding.resourceTitle} token count will exceed max token count: current count ${tokenCount}`)
-                        break
+            
+            // Check if we can add the full resource without exceeding limits
+            if (tokenCount + resourceContentWithExtraLinesRemoved.length <= MAX_TOKEN_COUNT) {
+                // Replace the embedding with the full resource
+                const existingIndex = result.findIndex(r => r.id === embedding.embeddingId)
+                if (existingIndex !== -1) {
+                    result[existingIndex] = {
+                        content: resourceContentWithExtraLinesRemoved,
+                        id: embedding.resourceId,
+                        title: embedding.resourceTitle,
+                        description: embedding.resourceDescription,
+                        contentSource: 'resource'
                     }
-                } else {
-                    result.push({ content: resourceContentWithExtraLinesRemoved , id: embedding.resourceId, title: embedding.resourceTitle, description: embedding.resourceDescription })
-                    tokenCount += resourceContentWithExtraLinesRemoved.length
+                    tokenCount = tokenCount - embedding.content.length + resourceContentWithExtraLinesRemoved.length
+                    log && console.log(`Upgraded to full resource for ${embedding.resourceTitle}`)
+                }
+            } else if (tokenCount + embedding.content.length <= MAX_TOKEN_COUNT * 0.8) {
+                // If we have room for some context, try to add a hybrid approach
+                const contextWindow = Math.floor((MAX_TOKEN_COUNT - tokenCount) * 0.3) // Use 30% of remaining space for context
+                const resourceContent = resourceContentWithExtraLinesRemoved
+                
+                // Find the embedding content in the resource and extract surrounding context
+                const embeddingIndex = resourceContent.indexOf(embedding.content)
+                if (embeddingIndex !== -1) {
+                    const start = Math.max(0, embeddingIndex - contextWindow / 2)
+                    const end = Math.min(resourceContent.length, embeddingIndex + embedding.content.length + contextWindow / 2)
+                    const contextualContent = resourceContent.substring(start, end)
+                    
+                    if (tokenCount + contextualContent.length <= MAX_TOKEN_COUNT) {
+                        const existingIndex = result.findIndex(r => r.id === embedding.embeddingId)
+                        if (existingIndex !== -1) {
+                            result[existingIndex] = {
+                                content: contextualContent,
+                                id: embedding.embeddingId,
+                                title: embedding.resourceTitle,
+                                description: embedding.resourceDescription,
+                                contentSource: 'hybrid'
+                            }
+                            tokenCount = tokenCount - embedding.content.length + contextualContent.length
+                            log && console.log(`Added contextual content for ${embedding.resourceTitle}`)
+                        }
+                    }
                 }
             }
         }
-        console.log(`Token count: ${tokenCount}`);
+
+        log && console.log(`Final token count: ${tokenCount}, Results: ${result.length}`);
         return result;
     } catch (error) {
         console.error(error);

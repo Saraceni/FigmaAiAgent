@@ -2,27 +2,28 @@
 https://www.figma.com/design/
 # Figma Design
 # Explore
-https://help.figma.com/hc/en-us/articles/15297425105303-Explore-design-files
-https://help.figma.com/hc/en-us/articles/360041064174-Access-design-tools-from-the-toolbar
-https://help.figma.com/hc/en-us/articles/360039832014-Design-prototype-and-explore-layer-properties-in-the-right-sidebar
+https://help.figma.com/hc/en-us/articles/15297425105303-Explore-design-files [update]
+https://help.figma.com/hc/en-us/articles/23954856027159-Navigating-UI3-Figma-s-new-UI [add]
+https://help.figma.com/hc/en-us/articles/360041064174-Access-design-tools-from-the-toolbar [update]
+https://help.figma.com/hc/en-us/articles/360039832014-Design-prototype-and-explore-layer-properties-in-the-right-sidebar [update]
 https://help.figma.com/hc/en-us/articles/360041064814-Change-the-background-color-of-the-canvas
-https://help.figma.com/hc/en-us/articles/360039831974-View-layers-and-pages-in-the-left-sidebar
+https://help.figma.com/hc/en-us/articles/360039831974-View-layers-and-pages-in-the-left-sidebar [update]
 # File Utilities
-https://help.figma.com/hc/en-us/articles/23570416033943-Use-the-actions-menu-in-Figma-Design
+https://help.figma.com/hc/en-us/articles/23570416033943-Use-the-actions-menu-in-Figma-Design [update]
 https://help.figma.com/hc/en-us/articles/4404575206295-Set-small-and-big-nudge-values
 https://help.figma.com/hc/en-us/articles/360038511413-Set-custom-thumbnails-for-files
 https://help.figma.com/hc/en-us/articles/5724448965527-View-layer-outlines-in-Figma-Design
 https://help.figma.com/hc/en-us/articles/360040328653-Keyboard-shortcuts-in-Figma
-https://help.figma.com/hc/en-us/articles/360041065034-Adjust-your-zoom-and-view-options
-https://help.figma.com/hc/en-us/articles/360040449713-Add-guides-to-the-canvas-or-frames
-https://help.figma.com/hc/en-us/articles/9141292269847-Find-and-replace-in-Figma
+https://help.figma.com/hc/en-us/articles/360041065034-Adjust-your-zoom-and-view-options [update]
+https://help.figma.com/hc/en-us/articles/360040449713-Add-guides-to-the-canvas-or-frames [update]
+https://help.figma.com/hc/en-us/articles/9141292269847-Find-and-replace-in-Figma [update]
 # Create and edit layers
 https://help.figma.com/hc/en-us/articles/360041539473-Frames-in-Figma-Design
 https://help.figma.com/hc/en-us/articles/360040450213-Vector-networks
 https://help.figma.com/hc/en-us/articles/360039957534-Boolean-operations
 https://help.figma.com/hc/en-us/articles/360040450173-Arc-tool-create-arcs-semi-circles-and-rings
 https://help.figma.com/hc/en-us/articles/4402723791511-Sketch-on-the-canvas-with-the-pencil-tool
-https://help.figma.com/hc/en-us/articles/360040450133-Shape-tools
+https://help.figma.com/hc/en-us/articles/360040450133-Shape-tools [update]
 https://help.figma.com/hc/en-us/articles/360039832054-The-difference-between-frames-and-groups
 https://help.figma.com/hc/en-us/articles/360040450253-Masks
 # Work with layers
@@ -91,7 +92,6 @@ https://help.figma.com/hc/en-us/articles/360038746534-Create-color-text-effect-a
 https://help.figma.com/hc/en-us/articles/360038662654-Guide-to-components-in-Figma
 https://help.figma.com/hc/en-us/articles/360056440594-Create-and-use-variants
 https://help.figma.com/hc/en-us/articles/5579474826519-Explore-component-properties
-https://help.figma.com/hc/en-us/articles/360055471353-Prepare-for-variants
 https://help.figma.com/hc/en-us/articles/360038663154-Create-components-to-reuse-in-designs
 https://help.figma.com/hc/en-us/articles/360061175334-Create-interactive-components-with-variants
 https://help.figma.com/hc/en-us/articles/360038663994-Name-and-organize-components
@@ -217,6 +217,8 @@ https://help.figma.com/hc/en-us/articles/23955143044247-Use-First-Draft-with-Fig
 https://help.figma.com/hc/en-us/articles/24004868368919-Rewrite-translate-and-shorten-text-with-AI
 https://help.figma.com/hc/en-us/articles/24004711129879-Rename-layers-with-AI
 https://help.figma.com/hc/en-us/articles/23796390206743-Replace-text-content-with-AI
+https://help.figma.com/hc/en-us/articles/24004542669463-Make-or-edit-an-image-with-AI
+https://help.figma.com/hc/en-us/articles/31326388366871-AI-text-suggestions
 # Projects
 https://help.figma.com/hc/en-us/articles/23510169950871-Design-a-file-thumbnail
 https://help.figma.com/hc/en-us/articles/20953528101783-Design-an-interactive-button
@@ -226,14 +228,11 @@ https://help.figma.com/hc/en-us/articles/16118297069463-Create-a-photo-gallery-p
 https://help.figma.com/hc/en-us/articles/8538436879767-Run-meetings-in-FigJam
 https://help.figma.com/hc/en-us/articles/14078912322199-Design-your-first-button
 https://help.figma.com/hc/en-us/articles/13543867954711-Create-an-illustration-in-Figma-Design
-https://help.figma.com/hc/en-us/articles/22690735962263-Create-a-tooltip-component-set
 https://help.figma.com/hc/en-us/articles/18894664907287-Create-a-responsive-card-with-auto-layout-and-constraints
 https://help.figma.com/hc/en-us/articles/18888057155991-Create-an-onboarding-flow-with-advanced-prototyping
 https://help.figma.com/hc/en-us/articles/18770195788951-Create-a-reusable-icon-grid
 https://help.figma.com/hc/en-us/articles/14942424871575-Create-your-first-meeting-board-in-FigJam
 https://help.figma.com/hc/en-us/articles/14794362149015-Create-pixel-art-in-Figma-Design
-https://help.figma.com/hc/en-us/articles/13666942319127-Create-a-basic-wireframe-and-prototype
-https://help.figma.com/hc/en-us/articles/13502530301207-Make-a-custom-profile-card
 # Best Practices
 https://www.figma.com/best-practices/workspaces-in-figma-enterprise/
 https://www.figma.com/best-practices/the-ux-writers-guide-to-figma/
